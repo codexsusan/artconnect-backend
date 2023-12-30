@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { createToken } from "../utils/token";
 
 export const RegisterUser = async (req: Request, res: Response) => {
-  const { name, email, phone, password, otp } = req.body;
+  const { name, email, phone, password } = req.body;
   try {
     // Check if the user already exists
     const user = await User.findOne({
@@ -35,7 +35,6 @@ export const RegisterUser = async (req: Request, res: Response) => {
       accountCreationDate: new Date(),
       lastLoginDate: new Date(),
       isVerified: false,
-      otp,
     });
 
     // Save the user to the database
@@ -51,5 +50,28 @@ export const RegisterUser = async (req: Request, res: Response) => {
   }
 };
 export const LoginUser = async (req: Request, res: Response) => {
-  // const {email}
+  const { email, password } = req.body;
+
+  try {
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Invalid credentials." });
+    }
+
+    // Compare the passwords
+    const isMatch: boolean = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid Credentials" });
+    }
+
+    const token = createToken(user._id, user.email);
+
+    return res
+      .status(200)
+      .json({ message: "User Logged In", success: true, token });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
