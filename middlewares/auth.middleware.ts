@@ -1,14 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import "../utils/extended-express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { UserInterface } from "../types";
 import { JWT_SECRET } from "../constants";
 
-declare module "express" {
-  interface Request {
-    userId: UserInterface["_id"];
-    email: UserInterface["email"];
-  }
-}
 export const verifyToken = async (
   req: Request,
   res: Response,

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import "../utils/extended-express";
 import User from "../models/user.model";
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/token";
