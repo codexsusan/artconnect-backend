@@ -21,3 +21,25 @@ export interface UserInterface {
   isVerified: boolean;
   otp: string;
 }
+
+export interface ArtistInterface {
+  _id: string;
+  userId: string;
+  artistName: string;
+  biography: string;
+  contactInfo: string;
+  socialMediaLinks: string[];
+  location: string;
+  websiteURL: string;
+  education: string;
+  style: string;
+  awardsHonors: string[];
+  exhibitions: string[];
+  collections: string[];
+  galleryRepresentation: string;
+  isFeatured: boolean;
+  isVerified: boolean;
+  joinDate: Date;
+  lastActiveDate: Date;
+  profileViews: number;
+}

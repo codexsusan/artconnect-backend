@@ -15,6 +15,7 @@ export const verifyToken = async (
     }
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     req.userId = decoded.userId;
+    req.email = decoded.email;
     next();
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });

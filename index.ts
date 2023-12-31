@@ -1,11 +1,12 @@
 import "dotenv/config";
-
 import express, { Request, Response } from "express";
 import morgan from "morgan";
 
 import { PORT, SERVER_TIMEOUT } from "./constants";
-import authRoutes from "./routes/auth.routes";
 import { dbConnection } from "./db_connection/connection";
+
+import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
 
 const port = PORT || 3000;
 const app = express();
@@ -14,6 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
 
+// Routes
 app.get("/api", (_: Request, res: Response): void => {
   res.send({ message: "Hello world" });
 });
@@ -25,6 +27,7 @@ app.get("/api/v1/", (_: Request, res: Response): void => {
 });
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/user", userRoutes);
 
 const server = app.listen(port, async () => {
   await dbConnection();
