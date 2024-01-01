@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import { EventsInterface } from "../types";
 import UserModel from "./user.model";
 
@@ -29,3 +29,6 @@ const eventsSchema: Schema<EventsInterface> = new Schema<EventsInterface>({
     required: false,
   },
 });
+
+const Event = model("Event", eventsSchema);
+export default Event;

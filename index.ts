@@ -10,6 +10,7 @@ import userRoutes from "./routes/user.routes";
 import artistRoutes from "./routes/artist.routes";
 import artworksRoutes from "./routes/artworks.routes";
 import favouritesRoutes from "./routes/favourites.routes";
+import eventsRoutes from "./routes/events.routes";
 
 const port = PORT || 3000;
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/artist", artistRoutes);
 app.use("/api/v1/artwork", artworksRoutes);
 app.use("/api/v1/favourites", favouritesRoutes);
+app.use("/api/v1/events", eventsRoutes);
 
 const server = app.listen(port, async () => {
   await dbConnection();

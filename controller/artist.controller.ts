@@ -35,6 +35,7 @@ export const RegisterArtist = async (req: Request, res: Response) => {
     return res.status(201).json({
       message: "Artist has been created successfully.",
       success: true,
+      data: newArtist,
     });
   } catch (e) {
     console.log(e);

@@ -74,3 +74,16 @@ export interface EventsInterface {
   organizerId: string;
   eventType: string;
 }
+
+export interface GalleryInterface {
+  _id: string;
+  name: string;
+  location: string;
+  description: string;
+  curatorId: string;
+  establishmentDate: Date;
+  openingTime: Date;
+  closingTime: Date;
+  contact: string;
+  isOpenWeekend: boolean;
+}
