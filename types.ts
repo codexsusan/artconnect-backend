@@ -58,3 +58,19 @@ export interface ArtworkInterface {
   creationDate: Date;
   availabilityStatus: ArtworkAvailability;
 }
+
+export interface FavouritesInterface {
+  _id: string;
+  userId: string;
+  artworkId: string;
+}
+
+export interface EventsInterface {
+  _id: string;
+  name: string;
+  description: string;
+  eventDate: Date;
+  location: string;
+  organizerId: string;
+  eventType: string;
+}
