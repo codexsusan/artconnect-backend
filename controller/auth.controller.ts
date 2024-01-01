@@ -1,37 +1,92 @@
 import { Request, Response } from "express";
 import "../utils/extended-express";
-import { createUser, getUser, loginUser } from "../services/user.services";
-import { UserLoginResponseDto, UserSignupResponseDto } from "../dto/user.dto";
+import bcrypt from "bcrypt";
+import { createToken } from "../utils/token";
+import { GenerateOTP } from "../utils/otp";
+import {
+  getUserByEmail,
+  getUserByEmailOrPhone,
+  getUserById,
+} from "../services/user.services";
+import User from "../models/user.model";
 
 export const RegisterUser = async (req: Request, res: Response) => {
   const { name, email, phone, password } = req.body;
   try {
-    const signupResponseDto: UserSignupResponseDto = await createUser({
+    const fetchedUser = await getUserByEmailOrPhone(email, phone);
+
+    if (fetchedUser) {
+      return res.status(400).json({
+        message: "Email or Phone No is already in use.",
+        success: false,
+      });
+    }
+
+    // Hash the password before saving to the database
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // TODO: Send it to the user's email or phone
+    const otp = GenerateOTP();
+
+    const username = name.concat(otp).split(" ").join("").toLowerCase();
+
+    // Create a new user instance
+    const newUser = await User.create({
+      username,
       name,
       email,
       phone,
-      password,
+      password: hashedPassword,
+      otp,
+      userType: "user",
+      accountCreationDate: new Date(),
+      lastLoginDate: new Date(),
+      isVerified: false,
     });
 
-    res.status(201).json(signupResponseDto);
+    // Generate the jwt token
+    const token = createToken(newUser._id, newUser.email);
+
+    res.status(201).json({
+      message: "User Created",
+      success: true,
+      token,
+      otp,
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error", success: false });
   }
 };
 export const LoginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const loginResponseDto: UserLoginResponseDto = await loginUser({
-      emailOrPhone: email,
-      password,
-    });
+    // Check if the user exists
+    const user = await getUserByEmail(email);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "Invalid credentials.", success: false });
+    }
 
-    return res.status(200).json(loginResponseDto);
+    // Compare the passwords
+    const isMatch: boolean = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ message: "Invalid Credentials", success: false });
+    }
+
+    const token = createToken(user._id, user.email);
+
+    return res
+      .status(200)
+      .json({ message: "User Logged In", success: true, token });
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error", success: false });
   }
 };
 
@@ -41,14 +96,16 @@ export const VerifyOTP = async (req: Request, res: Response) => {
 
   try {
     // Check if the user exists
-    const user = await getUser(userId);
+    const user = await getUserById(userId);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
 
     // Check if the otp is valid
     if (user.otp !== otp) {
-      return res.status(400).json({ message: "Invalid OTP" });
+      return res.status(400).json({ message: "Invalid OTP", success: false });
     }
 
     // Update the user's isVerified field

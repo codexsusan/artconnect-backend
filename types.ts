@@ -40,6 +40,5 @@ export interface ArtistInterface {
   isFeatured: boolean;
   isVerified: boolean;
   joinDate: Date;
-  lastActiveDate: Date;
   profileViews: number;
 }
