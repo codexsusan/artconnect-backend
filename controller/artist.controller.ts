@@ -44,3 +44,29 @@ export const RegisterArtist = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const GetArtistById = async (req: Request, res: Response) => {
+  const artistId = req.params.artistId;
+  try {
+    const artist = await Artist.findById(artistId);
+
+    if (!artist) {
+      return res.status(404).json({
+        message: "Artist not found.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Artist found.",
+      success: true,
+      data: artist,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};

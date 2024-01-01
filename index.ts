@@ -8,6 +8,7 @@ import { dbConnection } from "./db_connection/connection";
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import artistRoutes from "./routes/artist.routes";
+import artworksRoutes from "./routes/artworks.routes";
 
 const port = PORT || 3000;
 const app = express();
@@ -30,6 +31,7 @@ app.get("/api/v1/", (_: Request, res: Response): void => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/artist", artistRoutes);
+app.use("/api/v1/artwork", artworksRoutes);
 
 const server = app.listen(port, async () => {
   await dbConnection();

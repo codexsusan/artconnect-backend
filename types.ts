@@ -42,3 +42,19 @@ export interface ArtistInterface {
   joinDate: Date;
   profileViews: number;
 }
+
+export enum ArtworkAvailability {
+  AVAILABLE = "available",
+  SOLD = "sold",
+}
+
+export interface ArtworkInterface {
+  _id: string;
+  artistId: string;
+  title: string;
+  description: string;
+  imageURLs: string[];
+  medium: string;
+  creationDate: Date;
+  availabilityStatus: ArtworkAvailability;
+}
