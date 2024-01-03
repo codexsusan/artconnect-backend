@@ -7,7 +7,7 @@ import { CreateArtworkReqDTO, CreateArtworkResDTO } from "../dto/artwork.dto";
 import Artwork from "../models/artworks.model";
 import { fetchArtistIdByUserId } from "../services/artist.services";
 
-export const CreateArtwork = async (req: Request, res: Response) => {
+export const createArtwork = async (req: Request, res: Response) => {
   const userId: string = req.userId;
   const { title, description, imageURLs, medium, availabilityStatus } =
     req.body;

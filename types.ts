@@ -82,8 +82,28 @@ export interface GalleryInterface {
   description: string;
   curatorId: string;
   establishmentDate: Date;
-  openingTime: Date;
-  closingTime: Date;
+  openingTime: string;
+  closingTime: string;
   contact: string;
   isOpenWeekend: boolean;
 }
+
+export interface ExhibitionInterface {
+  _id: string;
+  galleryId: string;
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  openingTime: string;
+  closingTime: string;
+  exhibitionDate: Date;
+}
+
+// _id: ObjectId,
+//     galleryID: ObjectId, // Reference to Galleries collection
+//     eventName: String,
+//     description: String,
+//     startDate: Date,
+//     endDate: Date,
+//     isOngoing: Boolean,

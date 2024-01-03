@@ -5,7 +5,7 @@ import {
   getUserExceptPasswordAndOTP,
 } from "../services/user.services";
 
-export const FetchMe = async (req: Request, res: Response) => {
+export const fetchMe = async (req: Request, res: Response) => {
   try {
     const userId: string = req.userId;
 
@@ -25,7 +25,7 @@ export const FetchMe = async (req: Request, res: Response) => {
   }
 };
 
-export const FetchUserById = async (req: Request, res: Response) => {
+export const fetchUserById = async (req: Request, res: Response) => {
   const userId: string = req.params.userId;
   try {
     // Fetch User By excluding password and otp

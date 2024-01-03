@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import "../utils/extended-express";
 import Event from "../models/events.model";
 
-export const RegisterEvent = async (req: Request, res: Response) => {
+export const registerEvent = async (req: Request, res: Response) => {
   const userId: string = req.userId;
   // const { name, description, eventDate, location, eventType } = req.body;
   try {

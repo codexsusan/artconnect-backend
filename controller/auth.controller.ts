@@ -10,7 +10,7 @@ import {
 } from "../services/user.services";
 import User from "../models/user.model";
 
-export const RegisterUser = async (req: Request, res: Response) => {
+export const registerUser = async (req: Request, res: Response) => {
   const { name, email, phone, password } = req.body;
   try {
     const fetchedUser = await getUserByEmailOrPhone(email, phone);
@@ -59,7 +59,7 @@ export const RegisterUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal Server Error", success: false });
   }
 };
-export const LoginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
@@ -90,7 +90,7 @@ export const LoginUser = async (req: Request, res: Response) => {
   }
 };
 
-export const VerifyOTP = async (req: Request, res: Response) => {
+export const verifyOTP = async (req: Request, res: Response) => {
   const { otp } = req.body;
   const userId: string = req.userId;
 

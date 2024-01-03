@@ -3,7 +3,7 @@ import "../utils/extended-express";
 import Artist from "../models/artist.model";
 import { getUserById } from "../services/user.services";
 
-export const RegisterArtist = async (req: Request, res: Response) => {
+export const registerArtist = async (req: Request, res: Response) => {
   const userId: string = req.userId;
   const { artistName } = req.body;
   try {
@@ -46,7 +46,7 @@ export const RegisterArtist = async (req: Request, res: Response) => {
   }
 };
 
-export const GetArtistById = async (req: Request, res: Response) => {
+export const getArtistById = async (req: Request, res: Response) => {
   const artistId = req.params.artistId;
   try {
     const artist = await Artist.findById(artistId);
