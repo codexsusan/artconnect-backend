@@ -1,9 +1,9 @@
 import "dotenv/config";
-import express, { Request, Response } from "express";
+import express, {Request, Response} from "express";
 import morgan from "morgan";
 
-import { PORT, SERVER_TIMEOUT } from "./constants";
-import { dbConnection } from "./db_connection/connection";
+import {PORT, SERVER_TIMEOUT} from "./constants";
+import {dbConnection} from "./db_connection/connection";
 
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
@@ -13,6 +13,8 @@ import favouritesRoutes from "./routes/favourites.routes";
 import eventsRoutes from "./routes/events.routes";
 import galleryRoutes from "./routes/gallery.routes";
 import exhibitionRoutes from "./routes/exhibition.routes";
+import adminRoutes from "./routes/admin.routes";
+
 
 const port = PORT || 3000;
 const app = express();
@@ -23,17 +25,18 @@ app.use(morgan("dev"));
 
 // Routes
 app.get("/api", (_: Request, res: Response): void => {
-  res.send({ message: "Hello world" });
+    res.send({message: "Hello world"});
 });
 
 app.get("/api/v1/", (_: Request, res: Response): void => {
-  res.send({
-    message: "Hello everyone! This is the first version of the API.",
-  });
+    res.send({
+        message: "Hello everyone! This is the first version of the API.",
+    });
 });
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/artist", artistRoutes);
 app.use("/api/v1/artwork", artworksRoutes);
 app.use("/api/v1/favourites", favouritesRoutes);
@@ -42,8 +45,8 @@ app.use("/api/v1/gallery", galleryRoutes);
 app.use("/api/v1/exhibition", exhibitionRoutes);
 
 const server = app.listen(port, async () => {
-  await dbConnection();
-  return console.log(`Server running on port http://localhost:${port}`);
+    await dbConnection();
+    return console.log(`Server running on port http://localhost:${port}`);
 });
 
 server.timeout = parseInt(SERVER_TIMEOUT as string);

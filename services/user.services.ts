@@ -1,45 +1,45 @@
-import { UserInterface } from "../types";
+import {UserInterface} from "../types";
 import User from "../models/user.model";
 
 export const getUserByEmail = async (email: UserInterface["email"]) => {
-  try {
-    return User.findOne({ email });
-  } catch (e) {
-    console.log("Error while fetching user", e);
-    throw e;
-  }
+    try {
+        return await User.findOne({email});
+    } catch (e) {
+        console.log("Error while fetching user", e);
+        throw e;
+    }
 };
 
 export const getUserByEmailOrPhone = async (
-  email: UserInterface["email"],
-  phone: UserInterface["phone"],
+    email: UserInterface["email"],
+    phone: UserInterface["phone"],
 ) => {
-  try {
-    return User.findOne({
-      $or: [{ email }, { phone }],
-    });
-  } catch (e) {
-    console.log("Error while fetching user", e);
-    throw e;
-  }
+    try {
+        return await User.findOne({
+            $or: [{email}, {phone}],
+        });
+    } catch (e) {
+        console.log("Error while fetching user", e);
+        throw e;
+    }
 };
 
 export const getUserById = async (userId: UserInterface["_id"]) => {
-  try {
-    return User.findById(userId);
-  } catch (e) {
-    console.log("Error while fetching user", e);
-    throw e;
-  }
+    try {
+        return User.findById(userId);
+    } catch (e) {
+        console.log("Error while fetching user", e);
+        throw e;
+    }
 };
 
 export const getUserExceptPasswordAndOTP = async (
-  userId: UserInterface["_id"],
+    userId: UserInterface["_id"],
 ) => {
-  try {
-    return User.findById(userId).select("-password -otp");
-  } catch (e) {
-    console.log("Error while fetching user", e);
-    throw e;
-  }
+    try {
+        return User.findById(userId).select("-password");
+    } catch (e) {
+        console.log("Error while fetching user", e);
+        throw e;
+    }
 };

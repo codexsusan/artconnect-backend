@@ -11,3 +11,7 @@ export const JWT_SECRET = process.env.JWT_SECRET;
 // Email: Resend
 export const FROM_ADDRESS = process.env.FROM_ADDRESS;
 export const RESEND_SECRET = process.env.RESEND_SECRET;
+
+
+// Bcrypt
+export const SALT_ROUNDS: number = parseInt(process.env.SALT_ROUNDS) || 10;

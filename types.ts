@@ -23,7 +23,6 @@ export interface UserInterface {
     userType: string;
     isVerified: boolean;
     otp: string;
-    secondaryOtp: string;
 }
 
 export interface ArtistInterface {
@@ -104,9 +103,9 @@ export interface ExhibitionInterface {
     closingTime: string;
 }
 
-export interface Admin {
+export interface AdminInterface {
     _id: string;
-    userId: string;
+    name: string;
     adminName: string;
     contact: string;
     location: string;
@@ -115,5 +114,10 @@ export interface Admin {
     profilePicture: string;
     isVerified: boolean;
     otp: string;
-    secondaryOtp: string;
+}
+
+export interface CategoryInterface {
+    _id: string;
+    name: string;
+    imageURL: string;
 }

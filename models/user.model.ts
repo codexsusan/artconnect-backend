@@ -99,11 +99,7 @@ const userSchema: Schema<UserInterface> = new Schema<UserInterface>({
     otp: {
         type: String,
         required: false,
-    },
-    secondaryOtp: {
-        type: String,
-        required: false,
-    },
+    }
 });
 
 const User: Model<UserInterface> = model("User", userSchema);
