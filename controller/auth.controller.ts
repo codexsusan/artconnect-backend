@@ -169,53 +169,18 @@ export const forgetPassword = async (req: Request, res: Response) => {
         }
         // Generate the otp
         const otp = GenerateOTP();
-        user.secondaryOtp = otp;
+        user.otp = otp;
         await user.save();
 
         // Send the otp to the user's email
         await sendMail(email, "Reset Password", `<h1>OTP: ${otp}</h1>`);
 
+        clearFieldAfterDelay(user._id, User, "otp", 60 * 3);
         // Send the response
         return res.status(200).json({
             message: "OTP sent to your email",
             success: true,
             otp,
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            message: error.message,
-            success: false,
-        });
-    }
-}
-
-
-export const verifyResetPasswordOTP = async (req: Request, res: Response) => {
-    const {otp, email} = req.body;
-    try {
-        // Check if the user exists
-        const user = await getUserByEmail(email);
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found",
-                success: false,
-            });
-        }
-
-        const check: boolean = user.secondaryOtp == otp;
-        // Check if the otp is valid
-        if (!check) {
-            return res.status(400).json({
-                message: "Invalid OTP",
-                success: false,
-            });
-        }
-
-        // Send the response
-        return res.status(200).json({
-            message: "OTP verified.",
-            success: true,
         });
     } catch (error) {
         console.log(error);
