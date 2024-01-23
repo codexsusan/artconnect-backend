@@ -91,19 +91,11 @@ export interface GalleryInterface {
 export interface ExhibitionInterface {
   _id: string;
   galleryId: string;
+  userId: string;
   name: string;
   description: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   openingTime: string;
   closingTime: string;
-  exhibitionDate: Date;
 }
-
-// _id: ObjectId,
-//     galleryID: ObjectId, // Reference to Galleries collection
-//     eventName: String,
-//     description: String,
-//     startDate: Date,
-//     endDate: Date,
-//     isOngoing: Boolean,

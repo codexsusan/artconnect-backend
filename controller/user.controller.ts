@@ -13,15 +13,17 @@ export const fetchMe = async (req: Request, res: Response) => {
     const user = await getUserExceptPasswordAndOTP(userId);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
 
     return res
       .status(200)
       .json({ message: "User found", success: true, data: user });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
@@ -38,20 +40,25 @@ export const fetchUserById = async (req: Request, res: Response) => {
     return res
       .status(200)
       .json({ message: "User found", success: true, data: user });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
 // TODO: Not Implemented Yet
-export const UpdateUser = async (req: Request, res: Response) => {
+export const updateUser = async (req: Request, res: Response) => {
   const userId: string = req.params.userId;
   // const { dateOfBirth, bio, websiteURL } = req.body;
   try {
     const user = await getUserById(userId);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };

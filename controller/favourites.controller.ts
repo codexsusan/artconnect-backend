@@ -40,9 +40,9 @@ export const addOrRemoveFavouriteArtwork = async (
       success: true,
       data: newFavourite,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
@@ -58,8 +58,8 @@ export const getFavouriteArtworksByUser = async (
       success: true,
       data: fetchedFavourites,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };

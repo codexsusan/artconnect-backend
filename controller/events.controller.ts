@@ -16,15 +16,16 @@ export const registerEvent = async (req: Request, res: Response) => {
       success: true,
       data: newEvent,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error", success: false });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
 export const getEventById = async (req: Request, res: Response) => {
+  const { eventId } = req.params;
   try {
-    const event = await Event.findById(req.params.eventId);
+    const event = await Event.findById(eventId);
     if (!event) {
       return res
         .status(404)
@@ -33,9 +34,9 @@ export const getEventById = async (req: Request, res: Response) => {
     res
       .status(200)
       .json({ message: "Event found", success: true, data: event });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error", success: false });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 

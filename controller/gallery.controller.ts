@@ -23,9 +23,9 @@ export const registerGallery = async (req: Request, res: Response) => {
       success: true,
       data: newGallery,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error", success: false });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
@@ -44,10 +44,10 @@ export const getGalleryById = async (req: Request, res: Response) => {
       success: true,
       data: fetchedGallery,
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({
-      message: "Internal Server Error",
+      message: error.message,
       success: false,
     });
   }
@@ -70,8 +70,8 @@ export const deleteGalleryById = async (req: Request, res: Response) => {
       message: "Gallery deleted successfully",
       success: true,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error", success: false });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };

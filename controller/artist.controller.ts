@@ -12,9 +12,10 @@ export const registerArtist = async (req: Request, res: Response) => {
     });
 
     if (fetchedArtist) {
-      return res
-        .status(400)
-        .json({ message: "You are already registered as artist." });
+      return res.status(400).json({
+        message: "You are already registered as artist.",
+        success: false,
+      });
     }
     const fetchedUser = await getUserById(userId);
 
@@ -37,10 +38,10 @@ export const registerArtist = async (req: Request, res: Response) => {
       success: true,
       data: newArtist,
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({
-      message: "Internal Server Error",
+      message: error.message,
       success: false,
     });
   }
@@ -63,10 +64,10 @@ export const getArtistById = async (req: Request, res: Response) => {
       success: true,
       data: artist,
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({
-      message: "Internal Server Error",
+      message: error.message,
       success: false,
     });
   }

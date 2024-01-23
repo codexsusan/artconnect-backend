@@ -37,8 +37,8 @@ export const createArtwork = async (req: Request, res: Response) => {
       success: true,
       data: newArtwork,
     });
-  } catch (err) {
-    res.status(500).json({ error: err });
+  } catch (error) {
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
@@ -58,9 +58,9 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
       success: true,
       data: fetchedArtwork,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
@@ -86,9 +86,9 @@ export const fetchArtworksByArtistId = async (req: Request, res: Response) => {
       success: true,
       data: fetchedArtworks,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
@@ -113,8 +113,8 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
       message: "Artwork deleted successfully.",
       success: true,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
   }
 };
