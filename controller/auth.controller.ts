@@ -25,6 +25,7 @@ export const registerUser = async (req: Request, res: Response) => {
         const otp = GenerateOTP();
         const username = name.concat(otp).split(" ").join("").toLowerCase();
 
+        // TODO: Send the otp to the user's email
         // await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
         // Create a new user instance
         const newUser = await User.create({

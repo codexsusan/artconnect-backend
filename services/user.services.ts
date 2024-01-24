@@ -3,7 +3,7 @@ import User from "../models/user.model";
 
 export const getUserByEmail = async (email: UserInterface["email"]) => {
     try {
-        return await User.findOne({email});
+        return User.findOne({email});
     } catch (e) {
         console.log("Error while fetching user", e);
         throw e;
@@ -15,7 +15,7 @@ export const getUserByEmailOrPhone = async (
     phone: UserInterface["phone"],
 ) => {
     try {
-        return await User.findOne({
+        return User.findOne({
             $or: [{email}, {phone}],
         });
     } catch (e) {

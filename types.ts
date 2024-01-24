@@ -119,5 +119,13 @@ export interface AdminInterface {
 export interface CategoryInterface {
     _id: string;
     name: string;
-    imageURL: string;
+    categoryName: string;
+    imageUrl: string;
+}
+
+
+export interface UserCategoryInterface {
+    _id: string;
+    userId: string;
+    categoryId: string;
 }

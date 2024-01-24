@@ -14,6 +14,8 @@ import eventsRoutes from "./routes/events.routes";
 import galleryRoutes from "./routes/gallery.routes";
 import exhibitionRoutes from "./routes/exhibition.routes";
 import adminRoutes from "./routes/admin.routes";
+import categoryRoutes from "./routes/category.routes";
+import userCategoryRoutes from "./routes/userCategory.routes";
 
 
 const port = PORT || 3000;
@@ -43,6 +45,8 @@ app.use("/api/v1/favourites", favouritesRoutes);
 app.use("/api/v1/events", eventsRoutes);
 app.use("/api/v1/gallery", galleryRoutes);
 app.use("/api/v1/exhibition", exhibitionRoutes);
+app.use("/api/v1/category", categoryRoutes);
+app.use("/api/v1/user-category", userCategoryRoutes);
 
 const server = app.listen(port, async () => {
     await dbConnection();

@@ -6,9 +6,13 @@ const CategorySchema: Schema<CategoryInterface> = new Schema({
         type: String,
         required: true
     },
-    imageURL: {
+    categoryName: {
         type: String,
         required: true
+    },
+    imageUrl: {
+        type: String,
+        required: false,
     }
 });
 

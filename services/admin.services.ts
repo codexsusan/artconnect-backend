@@ -3,7 +3,7 @@ import {AdminInterface} from "../types";
 
 export const getAdminByEmail = async (email: AdminInterface["email"]) => {
     try {
-        return await Admin.findOne({email});
+        return Admin.findOne({email});
     } catch (e) {
         console.log("Error while fetching user", e);
         throw e;
