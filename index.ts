@@ -4,18 +4,7 @@ import morgan from "morgan";
 
 import {PORT, SERVER_TIMEOUT} from "./constants";
 import {dbConnection} from "./db_connection/connection";
-
-import authRoutes from "./routes/auth.routes";
-import userRoutes from "./routes/user.routes";
-import artistRoutes from "./routes/artist.routes";
-import artworksRoutes from "./routes/artworks.routes";
-import favouritesRoutes from "./routes/favourites.routes";
-import eventsRoutes from "./routes/events.routes";
-import galleryRoutes from "./routes/gallery.routes";
-import exhibitionRoutes from "./routes/exhibition.routes";
-import adminRoutes from "./routes/admin.routes";
-import categoryRoutes from "./routes/category.routes";
-import userCategoryRoutes from "./routes/userCategory.routes";
+import mainRoutes from "./routes/main.routes";
 
 
 const port = PORT || 3000;
@@ -30,23 +19,24 @@ app.get("/api", (_: Request, res: Response): void => {
     res.send({message: "Hello world"});
 });
 
-app.get("/api/v1/", (_: Request, res: Response): void => {
-    res.send({
-        message: "Hello everyone! This is the first version of the API.",
-    });
-});
+// app.get("/api/v1/", (_: Request, res: Response): void => {
+//     res.send({
+//         message: "Hello everyone! This is the first version of the API.",
+//     });
+// });
 
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/admin", adminRoutes);
-app.use("/api/v1/artist", artistRoutes);
-app.use("/api/v1/artwork", artworksRoutes);
-app.use("/api/v1/favourites", favouritesRoutes);
-app.use("/api/v1/events", eventsRoutes);
-app.use("/api/v1/gallery", galleryRoutes);
-app.use("/api/v1/exhibition", exhibitionRoutes);
-app.use("/api/v1/category", categoryRoutes);
-app.use("/api/v1/user-category", userCategoryRoutes);
+app.use("/api/v1", mainRoutes);
+
+// app.use("/api/v1/auth", authRoutes);
+// app.use("/api/v1/user", userRoutes);
+// app.use("/api/v1/admin", adminRoutes);
+// app.use("/api/v1/artwork", artworksRoutes);
+// app.use("/api/v1/favourites", favouritesRoutes);
+// app.use("/api/v1/events", eventsRoutes);
+// app.use("/api/v1/gallery", galleryRoutes);
+// app.use("/api/v1/exhibition", exhibitionRoutes);
+// app.use("/api/v1/category", categoryRoutes);
+// app.use("/api/v1/user-category", userCategoryRoutes);
 
 const server = app.listen(port, async () => {
     await dbConnection();

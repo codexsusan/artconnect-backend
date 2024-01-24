@@ -76,9 +76,10 @@ const userSchema: Schema<UserInterface> = new Schema<UserInterface>({
         type: String,
         required: false,
     },
-    accountCreationDate: {
-        type: Date,
+    isArtist: {
+        type: Boolean,
         required: true,
+        default: false,
     },
     lastLoginDate: {
         type: Date,

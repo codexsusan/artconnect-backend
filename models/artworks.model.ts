@@ -1,38 +1,52 @@
-import { model, Schema } from "mongoose";
-import { ArtworkInterface } from "../types";
-import ArtistModel from "./artist.model";
+import {model, Schema} from "mongoose";
+import {ArtworkAvailability, ArtworkInterface} from "../types";
+import UserModel from "./user.model";
 
 const artworkSchema: Schema<ArtworkInterface> = new Schema<ArtworkInterface>({
-  artistId: {
-    type: String,
-    required: true,
-    ref: ArtistModel,
-  },
-  title: {
-    type: String,
-    required: false,
-  },
-  description: {
-    type: String,
-    required: false,
-  },
-  imageURLs: {
-    type: [String],
-    required: true,
-  },
-  medium: {
-    type: String,
-    required: false,
-  },
-  creationDate: {
-    type: Date,
-    required: false,
-  },
-  availabilityStatus: {
-    type: String,
-    required: false,
-  },
-});
+    userId: {
+        type: String,
+        required: true,
+        ref: UserModel,
+    },
+    content: {
+        type: String,
+        required: false,
+        default: "",
+    },
+    imageUrls: {
+        type: [String],
+        required: true,
+    },
+    likeCount: {
+        type: String,
+        required: true,
+        default: "0",
+    },
+    commentCount: {
+        type: String,
+        required: true,
+        default: "0",
+    },
+    isForSale: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    price: {
+        type: String,
+        required: false,
+    },
+    quantity: {
+        type: String,
+        required: true,
+    },
+    availabilityStatus: {
+        type: String,
+        required: true,
+        enum: Object.values(ArtworkAvailability),
+        default: ArtworkAvailability.AVAILABLE,
+    },
+}, {timestamps: true});
 
 const Artwork = model<ArtworkInterface>("Artwork", artworkSchema);
 export default Artwork;

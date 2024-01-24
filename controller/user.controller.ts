@@ -46,6 +46,41 @@ export const fetchUserById = async (req: Request, res: Response) => {
     }
 };
 
+export const registerAsArtist = async (req: Request, res: Response) => {
+    const userId: string = req.userId;
+    try {
+        const fetchedUser = await getUserById(userId);
+
+        if (!fetchedUser) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false,
+            });
+        }
+
+        if (fetchedUser.isArtist) {
+            return res.status(400).json({
+                message: "User is already an artist.",
+                success: false,
+            });
+        }
+
+        fetchedUser.isArtist = true;
+        await fetchedUser.save();
+
+        return res.status(201).json({
+            message: "Artist has been created successfully.",
+            success: true,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: error.message,
+            success: false,
+        });
+    }
+}
+
 // TODO: Not Implemented Yet
 export const updateUser = async (req: Request, res: Response) => {
     const userId: string = req.params.userId;

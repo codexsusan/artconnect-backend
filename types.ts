@@ -1,11 +1,11 @@
 export interface UserInterface {
     _id: string;
+    name: string;
     username: string;
     email: string;
     password: string;
     profilePicture: string;
     location: string;
-    name: string;
     dateOfBirth: Date;
     bio: string;
     phone: string;
@@ -18,32 +18,11 @@ export interface UserInterface {
     occupation: string;
     education: string;
     preferredArtStyle: string;
-    accountCreationDate: Date;
+    isArtist: boolean;
     lastLoginDate: Date;
     userType: string;
     isVerified: boolean;
     otp: string;
-}
-
-export interface ArtistInterface {
-    _id: string;
-    userId: string;
-    artistName: string;
-    biography: string;
-    contactInfo: string;
-    socialMediaLinks: string[];
-    location: string;
-    websiteURL: string;
-    education: string;
-    style: string;
-    awardsHonors: string[];
-    exhibitions: string[];
-    collections: string[];
-    galleryRepresentation: string;
-    isFeatured: boolean;
-    isVerified: boolean;
-    joinDate: Date;
-    profileViews: number;
 }
 
 export enum ArtworkAvailability {
@@ -53,13 +32,15 @@ export enum ArtworkAvailability {
 
 export interface ArtworkInterface {
     _id: string;
-    artistId: string;
-    title: string;
-    description: string;
-    imageURLs: string[];
-    medium: string;
-    creationDate: Date;
+    userId: string;
+    content: string;
+    imageUrls: string[];
+    isForSale: boolean;
+    price: string;
+    quantity: string;
     availabilityStatus: ArtworkAvailability;
+    likeCount: string;
+    commentCount: string;
 }
 
 export interface FavouritesInterface {
@@ -122,7 +103,6 @@ export interface CategoryInterface {
     categoryName: string;
     imageUrl: string;
 }
-
 
 export interface UserCategoryInterface {
     _id: string;

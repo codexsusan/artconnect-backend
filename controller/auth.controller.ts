@@ -32,7 +32,7 @@ export const registerUser = async (req: Request, res: Response) => {
             username,
             name,
             email,
-            phone,
+            phone: `+91 ${phone}`,
             password: hashedPassword,
             otp,
             userType: "user",

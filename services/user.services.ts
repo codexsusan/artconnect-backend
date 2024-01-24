@@ -37,7 +37,7 @@ export const getUserExceptPasswordAndOTP = async (
     userId: UserInterface["_id"],
 ) => {
     try {
-        return User.findById(userId).select("-password");
+        return User.findById(userId).select("-password -__v");
     } catch (e) {
         console.log("Error while fetching user", e);
         throw e;
