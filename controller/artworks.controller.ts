@@ -7,6 +7,7 @@ import {getUserById} from "../services/user.services";
 
 export const createArtwork = async (req: Request, res: Response) => {
     const userId: string = req.userId;
+
     const {content, imageUrls, isForSale, price, quantity, availabilityStatus} =
         req.body;
     try {
@@ -19,7 +20,7 @@ export const createArtwork = async (req: Request, res: Response) => {
         }
 
         const artworkData: CreateArtworkReqDTO = {
-            artistId: fetchedUser._id,
+            userId: fetchedUser._id,
             content,
             imageUrls,
             isForSale,
@@ -109,3 +110,24 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
         res.status(500).json({message: error.message, success: false});
     }
 };
+
+
+export const fetchLatestArtworks = async (req: Request, res: Response) => {
+    try {
+        const fetchedArtworks = await Artwork.find().sort({createdAt: -1});
+        if (fetchedArtworks.length === 0) {
+            return res.status(404).json({
+                message: "Artworks not found.",
+                success: false,
+            });
+        }
+        res.status(200).json({
+            message: "Artworks fetched successfully.",
+            success: true,
+            data: fetchedArtworks,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message: error.message, success: false});
+    }
+}

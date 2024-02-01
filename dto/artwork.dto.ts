@@ -1,7 +1,7 @@
 import {ArtworkInterface, UserInterface} from "../types";
 
 export interface CreateArtworkReqDTO {
-    artistId: UserInterface["_id"];
+    userId: UserInterface["_id"];
     content: ArtworkInterface["content"];
     imageUrls: ArtworkInterface["imageUrls"];
     isForSale: ArtworkInterface["isForSale"];
