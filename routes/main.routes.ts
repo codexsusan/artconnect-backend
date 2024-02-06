@@ -9,15 +9,14 @@ import eventsRoutes from "./events.routes";
 import galleryRoutes from "./gallery.routes";
 import exhibitionRoutes from "./exhibition.routes";
 import categoryRoutes from "./category.routes";
-
-import userCategoryRoutes from "./userCategory.routes";
+import userInterestRoutes from "./user-interest.routes";
 
 const router = express.Router();
 
 router.get("/", (_: Request, res: Response): void => {
-    res.send({
-        message: "Hello everyone! This is the first version of the API.",
-    });
+  res.send({
+    message: "Hello everyone! This is the first version of the API.",
+  });
 });
 
 router.use("/auth", authRoutes);
@@ -29,6 +28,6 @@ router.use("/events", eventsRoutes);
 router.use("/gallery", galleryRoutes);
 router.use("/exhibition", exhibitionRoutes);
 router.use("/category", categoryRoutes);
-router.use("/user-category", userCategoryRoutes);
+router.use("/interest", userInterestRoutes);
 
 export default router;

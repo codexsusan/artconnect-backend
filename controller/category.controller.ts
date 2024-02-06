@@ -78,3 +78,30 @@ export const fetchCategory = async (req: Request, res: Response) => {
         });
     }
 }
+
+
+export const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    const { categoryId } = req.params;
+
+    const category = await Category.findByIdAndDelete(categoryId);
+
+    if (!category) {
+      return res.status(404).json({
+        message: "Category not found",
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      message: "Category deleted",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};

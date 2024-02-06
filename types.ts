@@ -26,86 +26,100 @@ export interface UserInterface {
 }
 
 export enum ArtworkAvailability {
-    AVAILABLE = "available",
-    SOLD = "sold",
+  AVAILABLE = "available",
+  SOLD = "sold",
+  NOTFORSALE = "notforsale",
 }
 
 export interface ArtworkInterface {
-    _id: string;
-    userId: string;
-    content: string;
-    imageUrls: string[];
-    isForSale: boolean;
-    price: string;
-    quantity: string;
-    availabilityStatus: ArtworkAvailability;
-    likeCount: string;
-    commentCount: string;
+  _id: string;
+  userId: string;
+  content: string;
+  imageUrls: string[];
+  isForSale: boolean;
+  price: string;
+  quantity: string;
+  availabilityStatus: ArtworkAvailability;
+  categoryIds: string[];
+  likeCount: string;
+  commentCount: string;
 }
 
 export interface FavouritesInterface {
-    _id: string;
-    userId: string;
-    artworkId: string;
+  _id: string;
+  userId: string;
+  artworkId: string;
 }
 
 export interface EventsInterface {
-    _id: string;
-    name: string;
-    description: string;
-    eventDate: Date;
-    location: string;
-    organizerId: string;
-    eventType: string;
+  _id: string;
+  name: string;
+  description: string;
+  eventDate: Date;
+  location: string;
+  organizerId: string;
+  eventType: string;
 }
 
 export interface GalleryInterface {
-    _id: string;
-    name: string;
-    location: string;
-    description: string;
-    curatorId: string;
-    establishmentDate: Date;
-    openingTime: string;
-    closingTime: string;
-    contact: string;
-    isOpenWeekend: boolean;
+  _id: string;
+  name: string;
+  location: string;
+  description: string;
+  curatorId: string;
+  establishmentDate: Date;
+  openingTime: string;
+  closingTime: string;
+  contact: string;
+  isOpenWeekend: boolean;
 }
 
 export interface ExhibitionInterface {
-    _id: string;
-    galleryId: string;
-    userId: string;
-    name: string;
-    description: string;
-    startDate: Date;
-    endDate: Date;
-    openingTime: string;
-    closingTime: string;
+  _id: string;
+  galleryId: string;
+  userId: string;
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  openingTime: string;
+  closingTime: string;
 }
 
 export interface AdminInterface {
-    _id: string;
-    name: string;
-    adminName: string;
-    contact: string;
-    location: string;
-    email: string;
-    password: string;
-    profilePicture: string;
-    isVerified: boolean;
-    otp: string;
+  _id: string;
+  name: string;
+  adminName: string;
+  contact: string;
+  location: string;
+  email: string;
+  password: string;
+  profilePicture: string;
+  isVerified: boolean;
+  otp: string;
 }
 
 export interface CategoryInterface {
-    _id: string;
-    name: string;
-    categoryName: string;
-    imageUrl: string;
+  _id: string;
+  name: string;
+  categoryName: string;
+  imageUrl: string;
 }
 
-export interface UserCategoryInterface {
-    _id: string;
-    userId: string;
-    categoryId: string;
+export interface UserInterestInterface {
+  _id: string;
+  userId: string;
+  interestId: string;
+}
+
+export interface ArtworkLikeInterface {
+  _id: string;
+  userId: string;
+  artworkId: string;
+}
+
+export interface UserBookmarksInterface {
+  _id: string;
+  userId: string;
+  artworkId: string;
 }

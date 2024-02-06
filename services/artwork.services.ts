@@ -1,14 +1,16 @@
 import Artwork from "../models/artworks.model";
-import { CreateArtworkReqDTO } from "../dto/artwork.dto";
 
-export const CreateArtworkService = async (data: CreateArtworkReqDTO) => {
-  try {
+export const CreateArtwork = async (data: any) => {
     return await Artwork.create({
-      ...data,
-      creationDate: new Date(),
+        ...data,
+        creationDate: new Date(),
     });
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
 };
+
+export const ArtworkById = async (id: string) => {
+    return Artwork.findById(id).select("-__v");
+}
+
+export const ArtworkByUserId = async (userId: string) => {
+    return Artwork.find({userId}).select("-__v");
+}

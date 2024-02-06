@@ -46,6 +46,9 @@ const artworkSchema: Schema<ArtworkInterface> = new Schema<ArtworkInterface>({
         enum: Object.values(ArtworkAvailability),
         default: ArtworkAvailability.AVAILABLE,
     },
+    categoryIds: {
+        type: [String],
+    }
 }, {timestamps: true});
 
 const Artwork = model<ArtworkInterface>("Artwork", artworkSchema);
