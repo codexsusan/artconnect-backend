@@ -118,6 +118,16 @@ export interface ArtworkLikeInterface {
   artworkId: string;
 }
 
+export interface ArtworkCommentInterface {
+  _id: string;
+  userId: string;
+  artworkId: string;
+  content: string;
+  parentId: string;
+  likeCount: string;
+  createdAt: Date;
+}
+
 export interface UserBookmarksInterface {
   _id: string;
   userId: string;

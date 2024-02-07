@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Bookmark from "../models/user-bookmarks.model";
+import "../utils/extended-express";
 
 export const switchBookmark = async (req: Request, res: Response) => {
   try {

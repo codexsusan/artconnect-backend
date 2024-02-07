@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import { switchLike } from "../controller/artwork-like.controller";
 import {
   createArtwork,
   deleteArtworkById,
@@ -7,12 +8,11 @@ import {
   fetchArtworksByUserId,
   fetchLatestArtworks,
 } from "../controller/artworks.controller";
-import { verifyToken } from "../middlewares/auth.middleware";
-import { switchLike } from "../controller/artwork-like.controller";
 import {
   switchBookmark,
   userBookmarks,
 } from "../controller/user-bookmarks.controller";
+import { verifyToken } from "../middlewares/auth.middleware";
 
 const router: Router = express.Router();
 
@@ -22,8 +22,10 @@ router.get("/fetch/artist/:userId", verifyToken, fetchArtworksByUserId);
 router.delete("/delete/:artworkId", verifyToken, deleteArtworkById);
 router.get("/fetch", verifyToken, fetchLatestArtworks);
 router.get("/category/:categoryId", verifyToken, fetchArtworkByCategory);
+
+// Artwork likes and bookmarks
 router.post("/switch-like", verifyToken, switchLike);
 router.post("/switch-bookmark", verifyToken, switchBookmark);
-router.get("/fetch-bookmark", verifyToken, userBookmarks);
+router.get("/bookmark", verifyToken, userBookmarks);
 
 export default router;
