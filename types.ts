@@ -133,3 +133,9 @@ export interface UserBookmarksInterface {
   userId: string;
   artworkId: string;
 }
+
+export interface CommentLikeInterface {
+  _id: string;
+  userId: string;
+  commentId: string;
+}

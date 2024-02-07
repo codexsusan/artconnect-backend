@@ -3,6 +3,7 @@ import Comment from "../models/artwork-comment.model";
 import Artwork from "../models/artworks.model";
 import "../utils/extended-express";
 import { fetchNestedComments } from "../services/artwork-comment.services";
+import CommentLike from "../models/comment-like.model";
 
 export const addComment = async (req: Request, res: Response) => {
   try {
@@ -125,6 +126,45 @@ export const fetchTopLevelComments = async (req: Request, res: Response) => {
       success: true,
       data: topLevelComments,
     });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message, success: false });
+  }
+};
+
+export const switchCommentLike = async (req: Request, res: Response) => {
+  try {
+    const userId = req.userId;
+    const commentId = req.params.commentId;
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res
+        .status(404)
+        .json({ message: "Comment not found", success: false });
+    }
+
+    const userLike = await CommentLike.findOne({
+      userId,
+      commentId,
+    });
+
+    if (userLike) {
+      await CommentLike.findByIdAndDelete(userLike._id);
+      const likeCount = parseInt(comment.likeCount) - 1;
+      comment.likeCount = likeCount.toString();
+      await comment.save();
+      res.status(200).json({ message: "Unliked", success: true });
+    } else {
+      await CommentLike.create({
+        userId,
+        commentId,
+      });
+      const likeCount = parseInt(comment.likeCount) + 1;
+      comment.likeCount = likeCount.toString();
+      await comment.save();
+      res.status(200).json({ message: "Liked", success: true });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message, success: false });
