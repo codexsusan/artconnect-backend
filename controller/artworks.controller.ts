@@ -43,6 +43,9 @@ export const createArtwork = async (req: Request, res: Response) => {
 
     const newArtwork = await CreateArtwork(artworkData);
 
+    fetchedUser.totalArtworks += 1;
+    await fetchedUser.save();
+
     res.status(201).json({
       message: "Artwork has been created successfully.",
       success: true,
@@ -116,6 +119,10 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
       });
     }
     await Artwork.deleteOne({ _id: artworkId, userId });
+
+    const fetchedUser = await getUserById(userId);
+    fetchedUser.totalArtworks -= 1;
+    await fetchedUser.save();
 
     res.status(200).json({
       message: "Artwork deleted successfully.",

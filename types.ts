@@ -139,3 +139,12 @@ export interface CommentLikeInterface {
   userId: string;
   commentId: string;
 }
+
+
+export interface UserFollowersInterface {
+  _id: string;
+  followingId: string;
+  followerId: string;
+}
+
+

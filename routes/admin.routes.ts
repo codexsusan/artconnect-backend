@@ -1,13 +1,15 @@
 import express from "express";
 import "../utils/extended-express";
 import {
-    forgetPassword,
-    loginAdmin,
-    regenerateOTP,
-    registerAdmin,
-    resetPassword,
-    verifyOtp
+  fetchAllUsers,
+  forgetPassword,
+  loginAdmin,
+  regenerateOTP,
+  registerAdmin,
+  resetPassword,
+  verifyOtp,
 } from "../controller/admin.controller";
+import { verifyToken } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
@@ -17,4 +19,5 @@ router.post("/verify-otp", verifyOtp);
 router.post("/regenerate-otp", regenerateOTP);
 router.post("/forget-password", forgetPassword);
 router.post("/reset-password", resetPassword);
+router.get("/all/user", verifyToken, fetchAllUsers);
 export default router;
