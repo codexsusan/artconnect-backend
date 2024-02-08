@@ -19,9 +19,9 @@ const router: Router = express.Router();
 router.post("/create", verifyToken, createArtwork);
 router.get("/fetch/:artworkId", verifyToken, fetchArtworkById);
 router.get("/fetch/artist/:userId", verifyToken, fetchArtworksByUserId);
-router.delete("/delete/:artworkId", verifyToken, deleteArtworkById);
 router.get("/fetch", verifyToken, fetchLatestArtworks);
 router.get("/category/:categoryId", verifyToken, fetchArtworkByCategory);
+router.delete("/delete/:artworkId", verifyToken, deleteArtworkById);
 
 // Artwork likes and bookmarks
 router.post("/switch-like", verifyToken, switchLike);

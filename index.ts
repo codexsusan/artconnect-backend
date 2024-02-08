@@ -14,8 +14,8 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // Routes
-app.get("/api", (_: Request, res: Response): void => {
-    res.send({message: "Hello world"});
+app.get("/api", (req: Request, res: Response): void => {
+  res.send({ message: "Hello world" });
 });
 
 app.use("/api/v1", mainRoutes);

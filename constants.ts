@@ -12,6 +12,12 @@ export const JWT_SECRET = process.env.JWT_SECRET;
 export const FROM_ADDRESS = process.env.FROM_ADDRESS;
 export const RESEND_SECRET = process.env.RESEND_SECRET;
 
-
 // Bcrypt
 export const SALT_ROUNDS: number = parseInt(process.env.SALT_ROUNDS) || 10;
+
+// Bucket Details
+export const BUCKET_ACCESS_KEY = process.env.BUCKET_ACCESS_KEY;
+export const BUCKET_BUCKET_NAME = process.env.BUCKET_BUCKET_NAME;
+export const BUCKET_ENDPOINT = process.env.BUCKET_ENDPOINT;
+export const BUCKET_REGION = process.env.BUCKET_REGION;
+export const BUCKET_SECRET_ACCESS_KEY = process.env.BUCKET_SECRET_ACCESS_KEY;

@@ -12,6 +12,7 @@ import categoryRoutes from "./category.routes";
 import userInterestRoutes from "./user-interest.routes";
 import artworkCommentRoutes from "./artwork-comment.routes";
 import userBookmarkRoutes from "./user-bookmark.routes";
+import uploadRoutes from "./images.routes";
 
 const router = express.Router();
 
@@ -33,5 +34,6 @@ router.use("/category", categoryRoutes);
 router.use("/interest", userInterestRoutes);
 router.use("/comment", artworkCommentRoutes);
 router.use("/bookmark", userBookmarkRoutes);
+router.use("/upload", uploadRoutes);
 
 export default router;
