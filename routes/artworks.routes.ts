@@ -7,6 +7,9 @@ import {
   fetchArtworkById,
   fetchArtworksByUserId,
   fetchLatestArtworks,
+  fetchThisMonthTopArtwork,
+  fetchThisWeeksTopArtwork,
+  fetchTodaysTopArtwork,
 } from "../controller/artworks.controller";
 import {
   switchBookmark,
@@ -22,6 +25,11 @@ router.get("/fetch/artist/:userId", verifyToken, fetchArtworksByUserId);
 router.get("/fetch", verifyToken, fetchLatestArtworks);
 router.get("/category/:categoryId", verifyToken, fetchArtworkByCategory);
 router.delete("/delete/:artworkId", verifyToken, deleteArtworkById);
+
+// Get artwork by time-period
+router.get("/fetch/top/today", verifyToken, fetchTodaysTopArtwork);
+router.get("/fetch/top/week", verifyToken, fetchThisWeeksTopArtwork);
+router.get("/fetch/top/month", verifyToken, fetchThisMonthTopArtwork);
 
 // Artwork likes and bookmarks
 router.post("/switch-like", verifyToken, switchLike);

@@ -162,3 +162,70 @@ export const fetchArtworkByCategory = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const allArtworks = await Artwork.find({
+      createdAt: { $gte: today, $lt: tomorrow },
+    }).sort({ likeCount: -1 });
+    return res.status(200).json({
+      message: "Artworks fetched successfully.",
+      success: true,
+      data: allArtworks,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
+  try {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(startOfWeek.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    const allArtworks = await Artwork.find({
+      createdAt: { $gte: startOfWeek, $lt: today },
+    }).sort({ likeCount: -1 });
+    return res.status(200).json({
+      message: "Artworks fetched successfully.",
+      success: true,
+      data: allArtworks,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
+  try {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const allArtworks = await Artwork.find({
+      createdAt: { $gte: startOfMonth, $lt: today },
+    }).sort({ likeCount: -1 });
+    return res.status(200).json({
+      message: "Artworks fetched successfully.",
+      success: true,
+      data: allArtworks,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
