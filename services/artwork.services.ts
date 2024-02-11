@@ -8,7 +8,13 @@ export const CreateArtwork = async (data: any) => {
 };
 
 export const ArtworkById = async (id: string) => {
-    return Artwork.findById(id).select("-__v");
+  return Artwork.findById(id)
+    .select("-__v")
+    .populate({
+      path: "user",
+      select: "name username email profilePicture",
+    })
+    .sort({ createdAt: -1 });
 }
 
 export const ArtworkByUserId = async (userId: string) => {

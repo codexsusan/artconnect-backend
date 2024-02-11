@@ -88,7 +88,12 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
 export const fetchArtworksByUserId = async (req: Request, res: Response) => {
   const userId: string = req.params.userId;
   try {
-    const fetchedArtworks = await Artwork.find({ user: userId });
+    const fetchedArtworks = await Artwork.find({ user: userId })
+      .populate({
+        path: "user",
+        select: "name username email profilePicture",
+      })
+      .sort({ createdAt: -1 });
     if (!fetchedArtworks) {
       return res.status(404).json({
         message: "Artworks not found.",
@@ -171,7 +176,15 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
 export const fetchArtworkByCategory = async (req: Request, res: Response) => {
   try {
     const categoryId = req.params.categoryId;
-    const allArtworks = await Artwork.find({ categoryIds: categoryId });
+    const allArtworks = await Artwork.find({
+      categoryIds: categoryId,
+    })
+      .populate({
+        path: "user",
+        select: "name username email profilePicture",
+      })
+      .sort({ createdAt: -1 });
+
     return res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
@@ -194,7 +207,12 @@ export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const allArtworks = await Artwork.find({
       createdAt: { $gte: today, $lt: tomorrow },
-    }).sort({ likeCount: -1 });
+    })
+      .populate({
+        path: "user",
+        select: "name username email profilePicture",
+      })
+      .sort({ likeCount: -1 });
     return res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
@@ -217,7 +235,12 @@ export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
     startOfWeek.setHours(0, 0, 0, 0);
     const allArtworks = await Artwork.find({
       createdAt: { $gte: startOfWeek, $lt: today },
-    }).sort({ likeCount: -1 });
+    })
+      .populate({
+        path: "user",
+        select: "name username email profilePicture",
+      })
+      .sort({ likeCount: -1 });
     return res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
@@ -238,7 +261,12 @@ export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const allArtworks = await Artwork.find({
       createdAt: { $gte: startOfMonth, $lt: today },
-    }).sort({ likeCount: -1 });
+    })
+      .populate({
+        path: "user",
+        select: "name username email profilePicture",
+      })
+      .sort({ likeCount: -1 });
     return res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,

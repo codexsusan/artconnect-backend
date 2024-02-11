@@ -1,28 +1,45 @@
+import { Readable } from "node:stream";
+
+export interface FileTransfer {
+  location?: string;
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  stream: Readable;
+  destination: string;
+  filename: string;
+  path: string;
+  buffer: Buffer;
+  key?: string;
+}
+
 export interface UserInterface {
-    _id: string;
-    name: string;
-    username: string;
-    email: string;
-    password: string;
-    profilePicture: string;
-    location: string;
-    dateOfBirth: Date;
-    bio: string;
-    phone: string;
-    websiteURL: string;
-    socialMediaLinks: string[];
-    totalArtworks: number;
-    totalFollowers: number;
-    totalFollowing: number;
-    interests: string[];
-    occupation: string;
-    education: string;
-    preferredArtStyle: string;
-    isArtist: boolean;
-    lastLoginDate: Date;
-    userType: string;
-    isVerified: boolean;
-    otp: string;
+  _id: string;
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+  profilePicture: string;
+  location: string;
+  dateOfBirth: Date;
+  bio: string;
+  phone: string;
+  websiteURL: string;
+  socialMediaLinks: string[];
+  totalArtworks: number;
+  totalFollowers: number;
+  totalFollowing: number;
+  interests: string[];
+  occupation: string;
+  education: string;
+  preferredArtStyle: string;
+  isArtist: boolean;
+  lastLoginDate: Date;
+  userType: string;
+  isVerified: boolean;
+  otp: string;
 }
 
 export enum ArtworkAvailability {
@@ -141,13 +158,11 @@ export interface CommentLikeInterface {
   commentId: string;
 }
 
-
 export interface UserFollowersInterface {
   _id: string;
   followingId: string;
   followerId: string;
 }
-
 
 export interface TransactionInterface {
   _id: string;

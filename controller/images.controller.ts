@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import "../utils/extended-express";
-import { FileTransfer } from "../dto/file.dto";
+import { FileTransfer } from "../types";
 
 export const uploadSingleImage = async (req: Request, res: Response) => {
   try {
