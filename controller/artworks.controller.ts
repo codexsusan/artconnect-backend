@@ -7,6 +7,7 @@ import { ArtworkById, CreateArtwork } from "../services/artwork.services";
 import { getUserById } from "../services/user.services";
 import { ArtworkAvailability } from "../types";
 import "../utils/extended-express";
+import Bookmark from "../models/user-bookmarks.model";
 
 export const createArtwork = async (req: Request, res: Response) => {
   const userId: string = req.userId;
@@ -60,6 +61,7 @@ export const createArtwork = async (req: Request, res: Response) => {
 
 export const fetchArtworkById = async (req: Request, res: Response) => {
   const artworkId: string = req.params.artworkId;
+  const userId = req.userId;
   try {
     const fetchedArtwork = await ArtworkById(artworkId);
     if (!fetchedArtwork) {
@@ -69,6 +71,16 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
       });
     }
 
+    const isLiked = await Like.findOne({
+      userId,
+      artworkId,
+    });
+
+    const isBookmarked = await Bookmark.findOne({
+      userId,
+      artworkId,
+    });
+
     const { categoryIds, ...updatedArtwork } = fetchedArtwork.toJSON();
     const categoryData = await Category.find({
       _id: { $in: categoryIds },
@@ -77,7 +89,12 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Artwork fetched successfully.",
       success: true,
-      data: { ...updatedArtwork, categories: categoryData },
+      data: {
+        ...updatedArtwork,
+        isLiked: isLiked ? true : false,
+        isBookmarked: isBookmarked ? true : false,
+        categories: categoryData,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -151,6 +168,7 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
 };
 
 export const fetchLatestArtworks = async (req: Request, res: Response) => {
+  const userId = req.userId;
   try {
     const fetchedArtworks = await Artwork.find()
       .populate({
@@ -159,10 +177,29 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
       })
       .sort({ createdAt: -1 });
 
+    const updatedArtworks = await Promise.all(
+      fetchedArtworks.map(async (artwork) => {
+        const isLiked = await Like.findOne({
+          userId,
+          artworkId: artwork._id,
+        });
+        const isBookmarked = await Bookmark.findOne({
+          userId,
+          artworkId: artwork._id,
+        });
+        const currentArtwork = {
+          ...artwork.toJSON(),
+          isLiked: isLiked ? true : false,
+          isBookmarked: isBookmarked ? true : false,
+        };
+        return currentArtwork;
+      })
+    );
+
     res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
-      data: fetchedArtworks,
+      data: updatedArtworks,
     });
   } catch (error) {
     console.log(error);
