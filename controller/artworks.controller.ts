@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import "../utils/extended-express";
+import Comment from "../models/artwork-comment.model";
+import Like from "../models/artwork-like.model";
 import Artwork from "../models/artworks.model";
-import { getUserById } from "../services/user.services";
-import { ArtworkAvailability } from "../types";
 import Category from "../models/category.model";
 import { ArtworkById, CreateArtwork } from "../services/artwork.services";
-import Like from "../models/artwork-like.model";
-import Comment from "../models/artwork-comment.model";
+import { getUserById } from "../services/user.services";
+import { ArtworkAvailability } from "../types";
+import "../utils/extended-express";
 
 export const createArtwork = async (req: Request, res: Response) => {
   const userId: string = req.userId;
@@ -31,7 +31,7 @@ export const createArtwork = async (req: Request, res: Response) => {
     }
 
     const artworkData = {
-      userId: fetchedUser._id,
+      user: fetchedUser._id,
       content,
       imageUrls,
       isForSale,
@@ -88,7 +88,7 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
 export const fetchArtworksByUserId = async (req: Request, res: Response) => {
   const userId: string = req.params.userId;
   try {
-    const fetchedArtworks = await Artwork.find({ userId });
+    const fetchedArtworks = await Artwork.find({ user: userId });
     if (!fetchedArtworks) {
       return res.status(404).json({
         message: "Artworks not found.",
@@ -112,7 +112,7 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
   try {
     const fetchedArtwork = await Artwork.findOne({
       _id: artworkId,
-      userId,
+      user: userId,
     });
 
     if (!fetchedArtwork) {
@@ -122,7 +122,7 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
       });
     }
 
-    await Artwork.deleteOne({ _id: artworkId, userId });
+    await Artwork.deleteOne({ _id: artworkId, user: userId });
     await Like.deleteMany({
       artworkId,
     });
@@ -147,7 +147,12 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
 
 export const fetchLatestArtworks = async (req: Request, res: Response) => {
   try {
-    const fetchedArtworks = await Artwork.find().sort({ createdAt: -1 });
+    const fetchedArtworks = await Artwork.find()
+      .populate({
+        path: "user",
+        select: "name username email profilePicture",
+      })
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       message: "Artworks fetched successfully.",

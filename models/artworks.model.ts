@@ -1,13 +1,19 @@
 import {model, Schema} from "mongoose";
 import {ArtworkAvailability, ArtworkInterface} from "../types";
-import UserModel from "./user.model";
+// import UserModel from "./user.model";
+
 
 const artworkSchema: Schema<ArtworkInterface> = new Schema<ArtworkInterface>(
   {
-    userId: {
+    user: {
       type: String,
       required: true,
-      ref: UserModel,
+      ref: "User",
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "",
     },
     content: {
       type: String,

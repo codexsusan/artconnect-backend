@@ -33,7 +33,8 @@ export enum ArtworkAvailability {
 
 export interface ArtworkInterface {
   _id: string;
-  userId: string;
+  user: string;
+  title: string;
   content: string;
   imageUrls: string[];
   isForSale: boolean;
