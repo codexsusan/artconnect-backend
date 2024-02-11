@@ -148,3 +148,12 @@ export interface UserFollowersInterface {
 }
 
 
+export interface TransactionInterface {
+  _id: string;
+  artworkId: string;
+  sellerId: string;
+  buyerId: string;
+  transactionDate: Date;
+  transactionAmount: string;
+  transactionStatus: string;
+}

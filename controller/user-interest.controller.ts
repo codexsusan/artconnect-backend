@@ -99,9 +99,13 @@ export const updateInterest = async (req: Request, res: Response) => {
 
 export const removeInterest = async (req: Request, res: Response) => {
   const interestId: string = req.params.interestId;
-  console.log(interestId);
+  const userId = req.userId;
   try {
-    const userInterest = await UserInterest.findByIdAndDelete(interestId);
+    const userInterest = await UserInterest.findOne({
+      interestId,
+      userId,
+    });
+
     if (!userInterest) {
       return res.status(404).json({
         message: "User interest not found.",
@@ -109,9 +113,15 @@ export const removeInterest = async (req: Request, res: Response) => {
       });
     }
 
+    const deletedOne = await UserInterest.deleteOne({
+      interestId,
+      userId,
+    });
+
     res.status(200).json({
       message: "User interest removed.",
       success: true,
+      data: deletedOne,
     });
   } catch (error) {
     console.log(error);

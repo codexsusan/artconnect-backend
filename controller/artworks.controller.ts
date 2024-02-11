@@ -5,6 +5,8 @@ import { getUserById } from "../services/user.services";
 import { ArtworkAvailability } from "../types";
 import Category from "../models/category.model";
 import { ArtworkById, CreateArtwork } from "../services/artwork.services";
+import Like from "../models/artwork-like.model";
+import Comment from "../models/artwork-comment.model";
 
 export const createArtwork = async (req: Request, res: Response) => {
   const userId: string = req.userId;
@@ -112,13 +114,22 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
       _id: artworkId,
       userId,
     });
+
     if (!fetchedArtwork) {
       return res.status(404).json({
         message: "Artwork not found.",
         success: false,
       });
     }
+
     await Artwork.deleteOne({ _id: artworkId, userId });
+    await Like.deleteMany({
+      artworkId,
+    });
+
+    await Comment.deleteMany({
+      artworkId,
+    });
 
     const fetchedUser = await getUserById(userId);
     fetchedUser.totalArtworks -= 1;

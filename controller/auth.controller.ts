@@ -58,6 +58,7 @@ export const registerUser = async (req: Request, res: Response) => {
         res.status(500).json({message: error.message, success: false});
     }
 };
+
 export const loginUser = async (req: Request, res: Response) => {
     const {email, password} = req.body;
     try {
