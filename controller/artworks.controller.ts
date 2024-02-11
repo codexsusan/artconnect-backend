@@ -1,13 +1,21 @@
 import { Request, Response } from "express";
+import "../utils/extended-express";
+
 import Comment from "../models/artwork-comment.model";
 import Like from "../models/artwork-like.model";
 import Artwork from "../models/artworks.model";
-import Category from "../models/category.model";
-import { ArtworkById, CreateArtwork } from "../services/artwork.services";
-import { getUserById } from "../services/user.services";
-import { ArtworkAvailability } from "../types";
-import "../utils/extended-express";
 import Bookmark from "../models/user-bookmarks.model";
+
+import {
+  ArtworkById,
+  CreateArtwork,
+  ExtractArtworkCategories,
+  checkIsBookmarked,
+  checkIsLiked,
+} from "../services/artwork.services";
+import { getUserById } from "../services/user.services";
+
+import { ArtworkAvailability } from "../types";
 
 export const createArtwork = async (req: Request, res: Response) => {
   const userId: string = req.userId;
@@ -71,20 +79,16 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
       });
     }
 
-    const isLiked = await Like.findOne({
-      userId,
-      artworkId,
-    });
+    const isLiked = await checkIsLiked(artworkId, userId);
 
     const isBookmarked = await Bookmark.findOne({
       userId,
       artworkId,
     });
 
-    const { categoryIds, ...updatedArtwork } = fetchedArtwork.toJSON();
-    const categoryData = await Category.find({
-      _id: { $in: categoryIds },
-    }).select("-__v");
+    const { updatedArtwork, categoryData } = await ExtractArtworkCategories(
+      fetchedArtwork.toJSON()
+    );
 
     res.status(200).json({
       message: "Artwork fetched successfully.",
@@ -104,6 +108,7 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
 
 export const fetchArtworksByUserId = async (req: Request, res: Response) => {
   const userId: string = req.params.userId;
+  const currentUserId = req.userId;
   try {
     const fetchedArtworks = await Artwork.find({ user: userId })
       .populate({
@@ -111,6 +116,31 @@ export const fetchArtworksByUserId = async (req: Request, res: Response) => {
         select: "name username email profilePicture",
       })
       .sort({ createdAt: -1 });
+
+    const updatedArtworks = await Promise.all(
+      fetchedArtworks.map(async (artwork) => {
+        const isLiked = await checkIsLiked(artwork._id, currentUserId);
+        const isBookmarked = await checkIsBookmarked(
+          artwork._id,
+          currentUserId
+        );
+
+        const currentArtwork = {
+          ...artwork.toJSON(),
+          isLiked: isLiked ? true : false,
+          isBookmarked: isBookmarked ? true : false,
+        };
+
+        const { updatedArtwork, categoryData } =
+          await ExtractArtworkCategories(currentArtwork);
+
+        return {
+          ...updatedArtwork,
+          categories: categoryData,
+        };
+      })
+    );
+
     if (!fetchedArtworks) {
       return res.status(404).json({
         message: "Artworks not found.",
@@ -120,7 +150,7 @@ export const fetchArtworksByUserId = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
-      data: fetchedArtworks,
+      data: updatedArtworks,
     });
   } catch (error) {
     console.log(error);
@@ -179,20 +209,22 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
 
     const updatedArtworks = await Promise.all(
       fetchedArtworks.map(async (artwork) => {
-        const isLiked = await Like.findOne({
-          userId,
-          artworkId: artwork._id,
-        });
-        const isBookmarked = await Bookmark.findOne({
-          userId,
-          artworkId: artwork._id,
-        });
+        const isLiked = await checkIsLiked(artwork._id, userId);
+        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
+
         const currentArtwork = {
           ...artwork.toJSON(),
           isLiked: isLiked ? true : false,
           isBookmarked: isBookmarked ? true : false,
         };
-        return currentArtwork;
+
+        const { updatedArtwork, categoryData } =
+          await ExtractArtworkCategories(currentArtwork);
+
+        return {
+          ...updatedArtwork,
+          categories: categoryData,
+        };
       })
     );
 
@@ -211,9 +243,10 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
 };
 
 export const fetchArtworkByCategory = async (req: Request, res: Response) => {
+  const userId = req.userId;
   try {
     const categoryId = req.params.categoryId;
-    const allArtworks = await Artwork.find({
+    const fetchedArtworks = await Artwork.find({
       categoryIds: categoryId,
     })
       .populate({
@@ -222,10 +255,31 @@ export const fetchArtworkByCategory = async (req: Request, res: Response) => {
       })
       .sort({ createdAt: -1 });
 
+    const updatedArtworks = await Promise.all(
+      fetchedArtworks.map(async (artwork) => {
+        const isLiked = await checkIsLiked(artwork._id, userId);
+        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
+
+        const currentArtwork = {
+          ...artwork.toJSON(),
+          isLiked: isLiked ? true : false,
+          isBookmarked: isBookmarked ? true : false,
+        };
+
+        const { updatedArtwork, categoryData } =
+          await ExtractArtworkCategories(currentArtwork);
+
+        return {
+          ...updatedArtwork,
+          categories: categoryData,
+        };
+      })
+    );
+
     return res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
-      data: allArtworks,
+      data: updatedArtworks,
     });
   } catch (error) {
     console.log(error);
@@ -237,12 +291,13 @@ export const fetchArtworkByCategory = async (req: Request, res: Response) => {
 };
 
 export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
+  const userId = req.userId;
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const allArtworks = await Artwork.find({
+    const fetchedArtworks = await Artwork.find({
       createdAt: { $gte: today, $lt: tomorrow },
     })
       .populate({
@@ -250,10 +305,32 @@ export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
         select: "name username email profilePicture",
       })
       .sort({ likeCount: -1 });
+
+    const updatedArtworks = await Promise.all(
+      fetchedArtworks.map(async (artwork) => {
+        const isLiked = await checkIsLiked(artwork._id, userId);
+        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
+
+        const currentArtwork = {
+          ...artwork.toJSON(),
+          isLiked: isLiked ? true : false,
+          isBookmarked: isBookmarked ? true : false,
+        };
+
+        const { updatedArtwork, categoryData } =
+          await ExtractArtworkCategories(currentArtwork);
+
+        return {
+          ...updatedArtwork,
+          categories: categoryData,
+        };
+      })
+    );
+
     return res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
-      data: allArtworks,
+      data: updatedArtworks,
     });
   } catch (error) {
     console.log(error);
@@ -265,12 +342,13 @@ export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
 };
 
 export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
+  const userId = req.userId;
   try {
     const today = new Date();
     const startOfWeek = new Date(today);
     startOfWeek.setDate(startOfWeek.getDate() - today.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
-    const allArtworks = await Artwork.find({
+    const fetchedArtworks = await Artwork.find({
       createdAt: { $gte: startOfWeek, $lt: today },
     })
       .populate({
@@ -278,10 +356,32 @@ export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
         select: "name username email profilePicture",
       })
       .sort({ likeCount: -1 });
+
+    const updatedArtworks = await Promise.all(
+      fetchedArtworks.map(async (artwork) => {
+        const isLiked = await checkIsLiked(artwork._id, userId);
+        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
+
+        const currentArtwork = {
+          ...artwork.toJSON(),
+          isLiked: isLiked ? true : false,
+          isBookmarked: isBookmarked ? true : false,
+        };
+
+        const { updatedArtwork, categoryData } =
+          await ExtractArtworkCategories(currentArtwork);
+
+        return {
+          ...updatedArtwork,
+          categories: categoryData,
+        };
+      })
+    );
+
     return res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
-      data: allArtworks,
+      data: updatedArtworks,
     });
   } catch (error) {
     console.log(error);
@@ -293,10 +393,11 @@ export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
 };
 
 export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
+  const userId = req.userId;
   try {
     const today = new Date();
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const allArtworks = await Artwork.find({
+    const fetchedArtworks = await Artwork.find({
       createdAt: { $gte: startOfMonth, $lt: today },
     })
       .populate({
@@ -304,10 +405,31 @@ export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
         select: "name username email profilePicture",
       })
       .sort({ likeCount: -1 });
+    const updatedArtworks = await Promise.all(
+      fetchedArtworks.map(async (artwork) => {
+        const isLiked = await checkIsLiked(artwork._id, userId);
+        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
+
+        const currentArtwork = {
+          ...artwork.toJSON(),
+          isLiked: isLiked ? true : false,
+          isBookmarked: isBookmarked ? true : false,
+        };
+
+        const { updatedArtwork, categoryData } =
+          await ExtractArtworkCategories(currentArtwork);
+
+        return {
+          ...updatedArtwork,
+          categories: categoryData,
+        };
+      })
+    );
+
     return res.status(200).json({
       message: "Artworks fetched successfully.",
       success: true,
-      data: allArtworks,
+      data: updatedArtworks,
     });
   } catch (error) {
     console.log(error);
