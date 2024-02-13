@@ -40,7 +40,7 @@ export interface UserInterface {
   userType: string;
   isVerified: boolean;
   otp: string;
-  token: string;
+  deviceToken: string[];
 }
 
 export enum ArtworkAvailability {
@@ -139,7 +139,7 @@ export interface ArtworkLikeInterface {
 
 export interface ArtworkCommentInterface {
   _id: string;
-  userId: string;
+  user: string;
   artworkId: string;
   content: string;
   parentId: string;
@@ -149,7 +149,7 @@ export interface ArtworkCommentInterface {
 
 export interface NestedCommentInterface {
   _id: string;
-  userId: string;
+  user: string;
   artworkId: string;
   content: string;
   createdAt: Date;

@@ -103,8 +103,8 @@ const userSchema: Schema<UserInterface> = new Schema<UserInterface>({
     type: String,
     required: false,
   },
-  token: {
-    type: String,
+  deviceToken: {
+    type: [String],
     required: false,
   },
 });

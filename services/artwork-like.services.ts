@@ -1,7 +1,7 @@
 import Like from "../models/artwork-like.model";
 import Artwork from "../models/artworks.model";
 
-export const likeArtwork = async (
+export const disLikeArtwork = async (
   likeId: string,
   artworkLikeCount: string,
   artworkId: string
@@ -13,7 +13,7 @@ export const likeArtwork = async (
   });
 };
 
-export const disLikeArtwork = async (
+export const likeArtwork = async (
   userId: string,
   artworkLikeCount: string,
   artworkId: string

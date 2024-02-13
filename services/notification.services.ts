@@ -29,5 +29,7 @@ export const notifyUsers = (body: NotificationMessageInterface) => {
       .catch((error) => {
         console.log("Error sending message:", error);
       });
+
+  console.log(notification);
   return notification;
 };

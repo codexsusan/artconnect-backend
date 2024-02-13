@@ -3,16 +3,18 @@ import "../utils/extended-express";
 
 import Like from "../models/artwork-like.model";
 import Artwork from "../models/artworks.model";
+import User from "../models/user.model";
 import { disLikeArtwork, likeArtwork } from "../services/artwork-like.services";
+import { notifyUsers } from "../services/notification.services";
 import { NotificationMessageInterface } from "../types";
-import { getUserById } from "../services/user.services";
 
 export const switchLike = async (req: Request, res: Response) => {
   const userId = req.userId;
   const artworkId = req.body.artworkId;
   try {
     const fetchedLike = await Like.findOne({ userId, artworkId });
-    const fetchedArtwork = await Artwork.findById(artworkId).populate("user");
+    const fetchedArtwork = await Artwork.findById(artworkId);
+    const authorUser = await User.findById(fetchedArtwork.user);
 
     if (!fetchedArtwork) {
       return res.status(404).json({
@@ -21,23 +23,34 @@ export const switchLike = async (req: Request, res: Response) => {
       });
     }
 
-    const fetchedUser = await getUserById(userId);
+    const fetchedUser = await User.findById(userId).select("username name");
 
-    if (fetchedLike && fetchedUser) {
-      await likeArtwork(fetchedLike._id, fetchedArtwork.likeCount, artworkId);
-      const notification: NotificationMessageInterface = {
-        title: "Liked",
-        body: `${fetchedUser.name} has liked your artwork.`,
-        tokens: [
-          "fLoYl44LSC-0NY7oUA_GVy:APA91bEZrRbHtIg_KemkiFyjXhX9f9V-1h1cyl_7ps4duzeeG1kg3feRsSIs8wJCNQlfQr5zUyR3_smG2Dnl88bJhB1v_jTicl6FHKedTPh_m8FRPyadeoqxJR4fVIFNdKYuyBFLlaKa",
-        ], // fetchedArtwork.user.token
-      };
+    if (!fetchedUser) {
+      return res.status(403).json({
+        message: "Unauthorized user.",
+        success: false,
+      });
+    }
+
+    if (fetchedLike) {
+      await disLikeArtwork(
+        fetchedLike._id,
+        fetchedArtwork.likeCount,
+        artworkId
+      );
       res.json({
         message: "Like removed successfully.",
         success: true,
       });
     } else {
-      await disLikeArtwork(userId, fetchedArtwork.likeCount, artworkId);
+      await likeArtwork(userId, fetchedArtwork.likeCount, artworkId);
+      const notification: NotificationMessageInterface = {
+        title: "Liked",
+        body: `${fetchedUser.name} has liked your artwork.`,
+        tokens: authorUser.deviceToken,
+      };
+
+      notifyUsers(notification);
       res.json({
         message: "Like added successfully.",
         success: true,

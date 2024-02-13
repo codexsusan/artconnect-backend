@@ -14,7 +14,7 @@ export const fetchNestedComments = async (commentId: string) => {
     const subComments = await fetchNestedComments(comment._id);
     const currentSubComments = {
       _id: comment._id,
-      userId: comment.userId,
+      user: comment.user,
       artworkId: comment.artworkId,
       content: comment.content,
       parentId: comment.parentId,

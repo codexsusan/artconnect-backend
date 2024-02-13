@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import Comment from "../models/artwork-comment.model";
 import Artwork from "../models/artworks.model";
-import "../utils/extended-express";
-import { fetchNestedComments } from "../services/artwork-comment.services";
 import CommentLike from "../models/comment-like.model";
-import { getUserById } from "../services/user.services";
-import { NestedCommentInterface, NotificationMessageInterface } from "../types";
+import User from "../models/user.model";
+import { fetchNestedComments } from "../services/artwork-comment.services";
 import { notifyUsers } from "../services/notification.services";
+import { NestedCommentInterface, NotificationMessageInterface } from "../types";
+import "../utils/extended-express";
 
 export const addComment = async (req: Request, res: Response) => {
   try {
@@ -14,8 +14,10 @@ export const addComment = async (req: Request, res: Response) => {
     const artworkId = req.params.artworkId;
     const content = req.body.content;
 
-    const artwork = await Artwork.findById(artworkId).populate("userId");
-    const fetchedUser = await getUserById(userId);
+    const artwork = await Artwork.findById(artworkId);
+    const fetchedUser = await User.findById(userId).select("username name");
+
+    const authorUser = await User.findById(artwork.user).select("deviceToken");
 
     if (!artwork) {
       return res
@@ -24,7 +26,7 @@ export const addComment = async (req: Request, res: Response) => {
     }
 
     const comment = await Comment.create({
-      userId,
+      user: userId,
       artworkId,
       content,
     });
@@ -32,9 +34,7 @@ export const addComment = async (req: Request, res: Response) => {
     const notification: NotificationMessageInterface = {
       title: "Art Connect",
       body: `${fetchedUser?.name} has commented on your artwork.`,
-      tokens: [
-        "fLoYl44LSC-0NY7oUA_GVy:APA91bEZrRbHtIg_KemkiFyjXhX9f9V-1h1cyl_7ps4duzeeG1kg3feRsSIs8wJCNQlfQr5zUyR3_smG2Dnl88bJhB1v_jTicl6FHKedTPh_m8FRPyadeoqxJR4fVIFNdKYuyBFLlaKa",
-      ],
+      tokens: authorUser.deviceToken,
     };
 
     notifyUsers(notification);
@@ -56,6 +56,8 @@ export const addNestedComment = async (req: Request, res: Response) => {
     const content = req.body.content;
     const artwork = await Artwork.findById(artworkId);
 
+    const fetchedUser = await User.findById(userId).select("username name");
+
     if (!artwork) {
       return res
         .status(404)
@@ -75,8 +77,12 @@ export const addNestedComment = async (req: Request, res: Response) => {
       }
     }
 
+    const authorUser = await User.findById(parentComment.user).select(
+      "deviceToken"
+    );
+
     const newComment = await Comment.create({
-      userId,
+      user: userId,
       artworkId,
       content,
       parentId: parentId ?? "0",
@@ -84,9 +90,11 @@ export const addNestedComment = async (req: Request, res: Response) => {
 
     const notification: NotificationMessageInterface = {
       title: "Art Connect",
-      body: ``,
-      tokens: [""],
+      body: `${fetchedUser?.name} has replied to your comment.`,
+      tokens: authorUser.deviceToken,
     };
+
+    notifyUsers(notification);
 
     res.status(201).json({
       message: "Comment added",
@@ -113,7 +121,7 @@ export const fetchAllComments = async (req: Request, res: Response) => {
       const comments = await fetchNestedComments(comment._id);
       const currentComment = {
         _id: comment._id,
-        userId: comment.userId,
+        user: comment.user,
         artworkId: comment.artworkId,
         content: comment.content,
         createdAt: comment.createdAt,
