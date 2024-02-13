@@ -4,6 +4,9 @@ import Artwork from "../models/artworks.model";
 import "../utils/extended-express";
 import { fetchNestedComments } from "../services/artwork-comment.services";
 import CommentLike from "../models/comment-like.model";
+import { getUserById } from "../services/user.services";
+import { NestedCommentInterface, NotificationMessageInterface } from "../types";
+import { notifyUsers } from "../services/notification.services";
 
 export const addComment = async (req: Request, res: Response) => {
   try {
@@ -11,7 +14,8 @@ export const addComment = async (req: Request, res: Response) => {
     const artworkId = req.params.artworkId;
     const content = req.body.content;
 
-    const artwork = await Artwork.findById(artworkId);
+    const artwork = await Artwork.findById(artworkId).populate("userId");
+    const fetchedUser = await getUserById(userId);
 
     if (!artwork) {
       return res
@@ -25,6 +29,15 @@ export const addComment = async (req: Request, res: Response) => {
       content,
     });
 
+    const notification: NotificationMessageInterface = {
+      title: "Art Connect",
+      body: `${fetchedUser?.name} has commented on your artwork.`,
+      tokens: [
+        "fLoYl44LSC-0NY7oUA_GVy:APA91bEZrRbHtIg_KemkiFyjXhX9f9V-1h1cyl_7ps4duzeeG1kg3feRsSIs8wJCNQlfQr5zUyR3_smG2Dnl88bJhB1v_jTicl6FHKedTPh_m8FRPyadeoqxJR4fVIFNdKYuyBFLlaKa",
+      ],
+    };
+
+    notifyUsers(notification);
     res
       .status(201)
       .json({ message: "Comment added", success: true, data: comment });
@@ -38,7 +51,6 @@ export const addNestedComment = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
     const parentId = req.params.parentId;
-    console.log(parentId);
     const artworkId = req.params.artworkId;
 
     const content = req.body.content;
@@ -70,6 +82,12 @@ export const addNestedComment = async (req: Request, res: Response) => {
       parentId: parentId ?? "0",
     });
 
+    const notification: NotificationMessageInterface = {
+      title: "Art Connect",
+      body: ``,
+      tokens: [""],
+    };
+
     res.status(201).json({
       message: "Comment added",
       success: true,
@@ -83,13 +101,14 @@ export const addNestedComment = async (req: Request, res: Response) => {
 
 export const fetchAllComments = async (req: Request, res: Response) => {
   try {
-    const artworkId = req.params.artworkId;
+    const artworkId: string = req.params.artworkId;
     const topLevelComments = await Comment.find({
       artworkId,
       parentId: "0",
     }).sort({ createdAt: -1 });
 
-    const nestedComments = [];
+    const nestedComments: NestedCommentInterface[] =
+      [] as NestedCommentInterface[];
     for (let comment of topLevelComments) {
       const comments = await fetchNestedComments(comment._id);
       const currentComment = {

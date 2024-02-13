@@ -103,6 +103,10 @@ const userSchema: Schema<UserInterface> = new Schema<UserInterface>({
     type: String,
     required: false,
   },
+  token: {
+    type: String,
+    required: false,
+  },
 });
 
 const User: Model<UserInterface> = model("User", userSchema);

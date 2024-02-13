@@ -15,14 +15,15 @@ import userBookmarkRoutes from "./user-bookmark.routes";
 import uploadRoutes from "./images.routes";
 import userFollowerRoutes from "./user-follower.routes";
 import searchRoutes from "./search.routes";
+import notificationRoutes from "./notification.routes";
 
 const router = express.Router();
 
-router.get("/", (_: Request, res: Response): void => {
-  res.send({
-    message: "Hello everyone! This is the first version of the API.",
-  });
-});
+// router.get("/", (_: Request, res: Response): void => {
+//   res.send({
+//     message: "Hello everyone! This is the first version of the API.",
+//   });
+// });
 
 router.use("/auth", authRoutes);
 router.use("/user", userRoutes);
@@ -39,8 +40,7 @@ router.use("/bookmark", userBookmarkRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/user-follower", userFollowerRoutes);
 router.use("/search", searchRoutes);
-
-
+router.use("/notification", notificationRoutes);
 
 
 export default router;

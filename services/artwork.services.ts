@@ -1,9 +1,9 @@
-import { Document, FlattenMaps } from "mongoose";
-import Artwork from "../models/artworks.model";
-import { ArtworkInterface } from "../types";
-import Category from "../models/category.model";
+import { FlattenMaps } from "mongoose";
 import Like from "../models/artwork-like.model";
+import Artwork from "../models/artworks.model";
+import Category from "../models/category.model";
 import Bookmark from "../models/user-bookmarks.model";
+import { ArtworkInterface } from "../types";
 
 export const CreateArtwork = async (data: any) => {
   return await Artwork.create({

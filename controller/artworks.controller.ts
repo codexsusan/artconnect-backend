@@ -15,7 +15,8 @@ import {
 } from "../services/artwork.services";
 import { getUserById } from "../services/user.services";
 
-import { ArtworkAvailability } from "../types";
+import { ArtworkAvailability, NotificationMessageInterface } from "../types";
+import { notifyUsers } from "../services/notification.services";
 
 export const createArtwork = async (req: Request, res: Response) => {
   const userId: string = req.userId;
@@ -56,6 +57,16 @@ export const createArtwork = async (req: Request, res: Response) => {
 
     fetchedUser.totalArtworks += 1;
     await fetchedUser.save();
+
+    const notificationData: NotificationMessageInterface = {
+      title: "Post Uploaded",
+      body: "Your post has been uploaded.",
+      tokens: [
+        "fLoYl44LSC-0NY7oUA_GVy:APA91bEZrRbHtIg_KemkiFyjXhX9f9V-1h1cyl_7ps4duzeeG1kg3feRsSIs8wJCNQlfQr5zUyR3_smG2Dnl88bJhB1v_jTicl6FHKedTPh_m8FRPyadeoqxJR4fVIFNdKYuyBFLlaKa",
+      ],
+    };
+
+    notifyUsers(notificationData);
 
     res.status(201).json({
       message: "Artwork has been created successfully.",
@@ -184,6 +195,9 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
     });
 
     const fetchedUser = await getUserById(userId);
+    if (!fetchedUser) {
+      return res.status(404).json();
+    }
     fetchedUser.totalArtworks -= 1;
     await fetchedUser.save();
 

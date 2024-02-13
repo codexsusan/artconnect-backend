@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 import { ArtworkCommentInterface } from "../types";
 
 const commentSchema: Schema<ArtworkCommentInterface> = new Schema({
-  userId: { type: String, required: true },
+  userId: { type: String, required: true, ref: "User" },
   artworkId: { type: String, required: true },
   content: { type: String, required: true },
   parentId: { type: String, default: "0" },

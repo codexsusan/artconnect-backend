@@ -40,6 +40,7 @@ export interface UserInterface {
   userType: string;
   isVerified: boolean;
   otp: string;
+  token: string;
 }
 
 export enum ArtworkAvailability {
@@ -146,6 +147,15 @@ export interface ArtworkCommentInterface {
   createdAt: Date;
 }
 
+export interface NestedCommentInterface {
+  _id: string;
+  userId: string;
+  artworkId: string;
+  content: string;
+  createdAt: Date;
+  children: NestedCommentInterface[];
+}
+
 export interface UserBookmarksInterface {
   _id: string;
   userId: string;
@@ -172,4 +182,10 @@ export interface TransactionInterface {
   transactionDate: Date;
   transactionAmount: string;
   transactionStatus: string;
+}
+
+export interface NotificationMessageInterface {
+  title: string;
+  body: string;
+  tokens: string[];
 }

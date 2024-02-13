@@ -1,4 +1,5 @@
 import Comment from "../models/artwork-comment.model";
+import { NestedCommentInterface } from "../types";
 
 export const fetchNestedComments = async (commentId: string) => {
   const comments = await Comment.find({ parentId: commentId }).sort({
@@ -7,7 +8,8 @@ export const fetchNestedComments = async (commentId: string) => {
   if (!comments || comments.length === 0) {
     return [];
   }
-  const nestedComments = [];
+  const nestedComments: NestedCommentInterface[] =
+    [] as NestedCommentInterface[];
   for (const comment of comments) {
     const subComments = await fetchNestedComments(comment._id);
     const currentSubComments = {
