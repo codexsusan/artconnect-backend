@@ -2,6 +2,11 @@ import { Request, Response } from "express";
 import "../utils/extended-express";
 import UserFollower from "../models/user-follower.model";
 import User from "../models/user.model";
+import {
+  createNotification,
+  notifyUsers,
+} from "../services/notification.services";
+import { NotificationMessageInterface } from "../types";
 
 export const followUser = async (req: Request, res: Response) => {
   try {
@@ -25,6 +30,20 @@ export const followUser = async (req: Request, res: Response) => {
     const followerUser = await User.findById(followerId);
     followerUser.totalFollowing += 1;
     await followerUser.save();
+
+    const notification: NotificationMessageInterface = {
+      title: "New Follower",
+      body: `${followerUser.email} started following you`,
+      tokens: followingUser.deviceToken,
+    };
+
+    notifyUsers(notification);
+
+    await createNotification(
+      followingId,
+      notification.title,
+      notification.body
+    );
 
     return res.json({
       success: true,

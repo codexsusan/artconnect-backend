@@ -4,7 +4,10 @@ import Artwork from "../models/artworks.model";
 import CommentLike from "../models/comment-like.model";
 import User from "../models/user.model";
 import { fetchNestedComments } from "../services/artwork-comment.services";
-import { notifyUsers } from "../services/notification.services";
+import {
+  createNotification,
+  notifyUsers,
+} from "../services/notification.services";
 import { NestedCommentInterface, NotificationMessageInterface } from "../types";
 import "../utils/extended-express";
 
@@ -38,6 +41,13 @@ export const addComment = async (req: Request, res: Response) => {
     };
 
     notifyUsers(notification);
+    if (userId !== artwork.user) {
+      await createNotification(
+        artwork.user,
+        notification.title,
+        notification.body
+      );
+    }
     res
       .status(201)
       .json({ message: "Comment added", success: true, data: comment });
@@ -95,6 +105,13 @@ export const addNestedComment = async (req: Request, res: Response) => {
     };
 
     notifyUsers(notification);
+    if (userId !== parentComment.user) {
+      await createNotification(
+        parentComment.user,
+        notification.title,
+        notification.body
+      );
+    }
 
     res.status(201).json({
       message: "Comment added",

@@ -5,7 +5,10 @@ import Like from "../models/artwork-like.model";
 import Artwork from "../models/artworks.model";
 import User from "../models/user.model";
 import { disLikeArtwork, likeArtwork } from "../services/artwork-like.services";
-import { notifyUsers } from "../services/notification.services";
+import {
+  createNotification,
+  notifyUsers,
+} from "../services/notification.services";
 import { NotificationMessageInterface } from "../types";
 
 export const switchLike = async (req: Request, res: Response) => {
@@ -14,7 +17,9 @@ export const switchLike = async (req: Request, res: Response) => {
   try {
     const fetchedLike = await Like.findOne({ userId, artworkId });
     const fetchedArtwork = await Artwork.findById(artworkId);
-    const authorUser = await User.findById(fetchedArtwork.user);
+    const authorUser = await User.findById(fetchedArtwork.user).select(
+      "deviceToken"
+    );
 
     if (!fetchedArtwork) {
       return res.status(404).json({
@@ -51,6 +56,14 @@ export const switchLike = async (req: Request, res: Response) => {
       };
 
       notifyUsers(notification);
+      if (userId !== fetchedArtwork.user) {
+        await createNotification(
+          fetchedArtwork.user,
+          notification.title,
+          notification.body
+        );
+      }
+
       res.json({
         message: "Like added successfully.",
         success: true,

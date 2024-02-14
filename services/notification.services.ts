@@ -1,5 +1,6 @@
 import { NotificationMessageInterface } from "../types";
 import admin from "../utils/notification-admin";
+import Notification from "../models/notification.model";
 
 export const notifyUsers = (body: NotificationMessageInterface) => {
   const tokens = [...body.tokens];
@@ -30,6 +31,17 @@ export const notifyUsers = (body: NotificationMessageInterface) => {
         console.log("Error sending message:", error);
       });
 
-  console.log(notification);
   return notification;
+};
+
+export const createNotification = async (
+  userId: string,
+  title: NotificationMessageInterface["title"],
+  body: NotificationMessageInterface["body"]
+) => {
+  return await Notification.create({
+    userId,
+    title,
+    body,
+  });
 };

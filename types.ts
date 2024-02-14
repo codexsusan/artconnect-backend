@@ -184,6 +184,14 @@ export interface TransactionInterface {
   transactionStatus: string;
 }
 
+export interface NotificationInterface {
+  _id: string;
+  userId: string;
+  title: string;
+  body: string;
+}
+
+
 export interface NotificationMessageInterface {
   title: string;
   body: string;
