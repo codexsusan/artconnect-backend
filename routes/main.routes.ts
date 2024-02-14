@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express, { Request, Response } from "express";
 import "../utils/extended-express";
 import authRoutes from "./auth.routes";
 import userRoutes from "./user.routes";
@@ -15,7 +15,7 @@ import userBookmarkRoutes from "./user-bookmark.routes";
 import uploadRoutes from "./images.routes";
 import userFollowerRoutes from "./user-follower.routes";
 import searchRoutes from "./search.routes";
-
+import notificationRoutes from "./notification.routes";
 
 const router = express.Router();
 
@@ -40,6 +40,6 @@ router.use("/bookmark", userBookmarkRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/user-follower", userFollowerRoutes);
 router.use("/search", searchRoutes);
-
+router.use("/notification", notificationRoutes);
 
 export default router;
