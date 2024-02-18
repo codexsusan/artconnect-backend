@@ -41,6 +41,8 @@ export const addComment = async (req: Request, res: Response) => {
     };
 
     notifyUsers(notification);
+    artwork.commentCount = (parseInt(artwork.commentCount) + 1).toString();
+    await artwork.save();
     if (userId !== artwork.user) {
       await createNotification(
         artwork.user,
