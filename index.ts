@@ -3,9 +3,12 @@ import express, { NextFunction, Request, Response } from "express";
 import "./utils/extended-express";
 import morgan from "morgan";
 
+import { createServer } from "http";
+
 import { PORT } from "./constants";
 import { dbConnection } from "./db_connection/connection";
 import mainRoutes from "./routes/main.routes";
+import { initSocket } from "./sockets/socketHandler";
 
 const port = PORT || 3000;
 const app = express();
@@ -14,6 +17,9 @@ const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
 
+// socket.io
+const server = createServer(app);
+const io = initSocket(server);
 // Routes
 app.get("/api", (_req: Request, res: Response): void => {
   res.send({ message: "Hello world" });
@@ -32,7 +38,7 @@ app.use(
   }
 );
 
-const server = app.listen(port, async () => {
+server.listen(port, async () => {
   await dbConnection();
   return console.log(`Server running on port http://localhost:${port}`);
 });

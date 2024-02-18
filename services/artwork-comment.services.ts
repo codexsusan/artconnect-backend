@@ -2,9 +2,14 @@ import Comment from "../models/artwork-comment.model";
 import { NestedCommentInterface } from "../types";
 
 export const fetchNestedComments = async (commentId: string) => {
-  const comments = await Comment.find({ parentId: commentId }).sort({
-    createdAt: -1,
-  });
+  const comments = await Comment.find({ parentId: commentId })
+    .sort({
+      createdAt: -1,
+    })
+    .populate({
+      path: "user",
+      select: "username name profilePicture",
+    });
   if (!comments || comments.length === 0) {
     return [];
   }

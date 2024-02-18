@@ -130,7 +130,12 @@ export const fetchAllComments = async (req: Request, res: Response) => {
     const topLevelComments = await Comment.find({
       artworkId,
       parentId: "0",
-    }).sort({ createdAt: -1 });
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "username name profilePicture",
+      });
 
     const nestedComments: NestedCommentInterface[] =
       [] as NestedCommentInterface[];
@@ -163,7 +168,12 @@ export const fetchTopLevelComments = async (req: Request, res: Response) => {
     const topLevelComments = await Comment.find({
       artworkId,
       parentId: "0",
-    }).sort({ createdAt: -1 });
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "username name profilePicture",
+      });
 
     res.status(200).json({
       message: "Fetched successfully.",
