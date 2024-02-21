@@ -40,6 +40,11 @@ export const createArtwork = async (req: Request, res: Response) => {
       });
     }
 
+    const availabilityStatusCheck =
+      isForSale && quantity > 0
+        ? ArtworkAvailability.AVAILABLE
+        : ArtworkAvailability.NOTFORSALE;
+
     const artworkData = {
       user: fetchedUser._id,
       content,
@@ -47,9 +52,7 @@ export const createArtwork = async (req: Request, res: Response) => {
       isForSale,
       price: isForSale ? price : 0,
       quantity,
-      availabilityStatus: isForSale
-        ? availabilityStatus
-        : ArtworkAvailability.NOTFORSALE,
+      availabilityStatus: availabilityStatusCheck,
       categoryIds,
     };
 
@@ -215,9 +218,14 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
   const userId = req.userId;
   try {
     const fetchedArtworks = await Artwork.find()
+      .select("-__v")
       .populate({
         path: "user",
         select: "name username email profilePicture",
+      })
+      .populate({
+        path: "categoryIds",
+        select: "name categoryName imageUrl",
       })
       .sort({ createdAt: -1 });
 
@@ -226,18 +234,19 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
         const isLiked = await checkIsLiked(artwork._id, userId);
         const isBookmarked = await checkIsBookmarked(artwork._id, userId);
 
-        const currentArtwork = {
+        // const currentArtwork = {
+        //   ...artwork.toJSON(),
+        //   isLiked: isLiked ? true : false,
+        //   isBookmarked: isBookmarked ? true : false,
+        // };
+
+        // const { updatedArtwork, categoryData } =
+        //   await ExtractArtworkCategories(currentArtwork);
+
+        return {
           ...artwork.toJSON(),
           isLiked: isLiked ? true : false,
           isBookmarked: isBookmarked ? true : false,
-        };
-
-        const { updatedArtwork, categoryData } =
-          await ExtractArtworkCategories(currentArtwork);
-
-        return {
-          ...updatedArtwork,
-          categories: categoryData,
         };
       })
     );

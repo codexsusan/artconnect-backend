@@ -1,7 +1,11 @@
 import Comment from "../models/artwork-comment.model";
+import CommentLike from "../models/comment-like.model";
 import { NestedCommentInterface } from "../types";
 
-export const fetchNestedComments = async (commentId: string) => {
+export const fetchNestedComments = async (
+  commentId: string,
+  userId: string
+) => {
   const comments = await Comment.find({ parentId: commentId })
     .sort({
       createdAt: -1,
@@ -13,17 +17,25 @@ export const fetchNestedComments = async (commentId: string) => {
   if (!comments || comments.length === 0) {
     return [];
   }
+  const updatedComments = await Promise.all(
+    comments.map(async (comment) => {
+      const isLiked = await CommentLike.findOne({
+        commentId: comment._id,
+        userId,
+      });
+      return {
+        ...comment.toJSON(),
+        isLiked: isLiked ? true : false,
+      };
+    })
+  );
+
   const nestedComments: NestedCommentInterface[] =
     [] as NestedCommentInterface[];
-  for (const comment of comments) {
-    const subComments = await fetchNestedComments(comment._id);
+  for (const comment of updatedComments) {
+    const subComments = await fetchNestedComments(comment._id, userId);
     const currentSubComments = {
-      _id: comment._id,
-      user: comment.user,
-      artworkId: comment.artworkId,
-      content: comment.content,
-      parentId: comment.parentId,
-      createdAt: comment.createdAt,
+      ...comment,
       children: subComments,
     };
     nestedComments.push(currentSubComments);

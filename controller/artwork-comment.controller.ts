@@ -128,27 +128,38 @@ export const addNestedComment = async (req: Request, res: Response) => {
 
 export const fetchAllComments = async (req: Request, res: Response) => {
   try {
+    const userId = req.userId;
     const artworkId: string = req.params.artworkId;
     const topLevelComments = await Comment.find({
       artworkId,
       parentId: "0",
     })
+      .select("-__v")
       .sort({ createdAt: -1 })
       .populate({
         path: "user",
         select: "username name profilePicture",
       });
 
+    const updatedTopLevelComments = Promise.all(
+      topLevelComments.map(async (comment) => {
+        const isLiked = await CommentLike.findOne({
+          userId,
+          commentId: comment._id,
+        });
+        return {
+          ...comment.toJSON(),
+          isLiked: isLiked ? true : false,
+        };
+      })
+    );
+
     const nestedComments: NestedCommentInterface[] =
       [] as NestedCommentInterface[];
-    for (let comment of topLevelComments) {
-      const comments = await fetchNestedComments(comment._id);
+    for (let comment of await updatedTopLevelComments) {
+      const comments = await fetchNestedComments(comment._id, userId);
       const currentComment = {
-        _id: comment._id,
-        user: comment.user,
-        artworkId: comment.artworkId,
-        content: comment.content,
-        createdAt: comment.createdAt,
+        ...comment,
         children: comments,
       };
       nestedComments.push(currentComment);

@@ -16,6 +16,7 @@ import uploadRoutes from "./images.routes";
 import userFollowerRoutes from "./user-follower.routes";
 import searchRoutes from "./search.routes";
 import notificationRoutes from "./notification.routes";
+import commentLikeRoutes from "./comment-like.routes";
 
 const router = express.Router();
 
@@ -36,6 +37,7 @@ router.use("/exhibition", exhibitionRoutes);
 router.use("/category", categoryRoutes);
 router.use("/interest", userInterestRoutes);
 router.use("/comment", artworkCommentRoutes);
+router.use("/comment-like", commentLikeRoutes);
 router.use("/bookmark", userBookmarkRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/user-follower", userFollowerRoutes);

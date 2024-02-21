@@ -1,7 +1,6 @@
-import {model, Schema} from "mongoose";
-import {ArtworkAvailability, ArtworkInterface} from "../types";
+import { model, Schema } from "mongoose";
+import { ArtworkAvailability, ArtworkInterface } from "../types";
 // import UserModel from "./user.model";
-
 
 const artworkSchema: Schema<ArtworkInterface> = new Schema<ArtworkInterface>(
   {
@@ -23,6 +22,7 @@ const artworkSchema: Schema<ArtworkInterface> = new Schema<ArtworkInterface>(
     imageUrls: {
       type: [String],
       required: true,
+      default: [""],
     },
     likeCount: {
       type: String,
@@ -53,10 +53,7 @@ const artworkSchema: Schema<ArtworkInterface> = new Schema<ArtworkInterface>(
       enum: Object.values(ArtworkAvailability),
       default: ArtworkAvailability.AVAILABLE,
     },
-    categoryIds: {
-      type: [String],
-      ref: "Category",
-    },
+    categoryIds: [{ type: Schema.Types.ObjectId, ref: "Category" }],
   },
   { timestamps: true }
 );
