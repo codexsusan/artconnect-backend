@@ -10,6 +10,7 @@ import {
 import User from "../models/user.model";
 import { clearFieldAfterDelay } from "../utils/general";
 import { passwordHasher } from "../utils/password";
+import { sendMail } from "../utils/sendMail";
 
 export const registerUser = async (req: Request, res: Response) => {
   const { name, email, phone, password, deviceToken } = req.body;
@@ -28,8 +29,8 @@ export const registerUser = async (req: Request, res: Response) => {
     const otp = GenerateOTP();
     const username = name.concat(otp).split(" ").join("").toLowerCase();
 
-    // TODO: Send the otp to the user's email
-    // await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
+    await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
+
     // Create a new user instance
     const newUser = await User.create({
       username,
@@ -147,7 +148,7 @@ export const regenerateOTP = async (req: Request, res: Response) => {
     user.otp = otp;
     await user.save();
 
-    // await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
+    await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
 
     clearFieldAfterDelay(user._id, User, "otp", 60 * 3);
     return res.status(200).json({
@@ -181,7 +182,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
     await user.save();
 
     // Send the otp to the user's email
-    // await sendMail(email, "Reset Password", `<h1>OTP: ${otp}</h1>`);
+    await sendMail(email, "Reset Password", `<h1>OTP: ${otp}</h1>`);
 
     clearFieldAfterDelay(user._id, User, "otp", 60 * 3);
     // Send the response

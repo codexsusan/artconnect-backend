@@ -45,11 +45,12 @@ const artworkSchema: Schema<ArtworkInterface> = new Schema<ArtworkInterface>(
     },
     quantity: {
       type: String,
-      required: true,
+      required: false,
+      default: "0",
     },
     availabilityStatus: {
       type: String,
-      required: true,
+      required: false,
       enum: Object.values(ArtworkAvailability),
       default: ArtworkAvailability.AVAILABLE,
     },
