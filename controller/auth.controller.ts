@@ -8,7 +8,7 @@ import {
   getUserByEmailOrPhone,
 } from "../services/user.services";
 import User from "../models/user.model";
-import { clearFieldAfterDelay } from "../utils/general";
+import { clearUserOtpAfterDelay } from "../utils/general";
 import { passwordHasher } from "../utils/password";
 import { sendMail } from "../utils/sendMail";
 
@@ -50,7 +50,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const token = createToken(newUser._id, newUser.email);
 
     // Clear the otp field after 3 minutes
-    clearFieldAfterDelay(newUser._id, User, "otp", 60 * 3);
+    clearUserOtpAfterDelay(newUser._id, 60 * 3);
 
     res.status(201).json({
       message: "User Created",
@@ -150,7 +150,7 @@ export const regenerateOTP = async (req: Request, res: Response) => {
 
     await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
 
-    clearFieldAfterDelay(user._id, User, "otp", 60 * 3);
+    clearUserOtpAfterDelay(user._id, 60 * 3);
     return res.status(200).json({
       message: "OTP sent to your email",
       success: true,
@@ -184,7 +184,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
     // Send the otp to the user's email
     await sendMail(email, "Reset Password", `<h1>OTP: ${otp}</h1>`);
 
-    clearFieldAfterDelay(user._id, User, "otp", 60 * 3);
+    clearUserOtpAfterDelay(user._id, 60 * 3);
     // Send the response
     return res.status(200).json({
       message: "OTP sent to your email",

@@ -4,7 +4,7 @@ import { getAdminByEmail } from "../services/admin.services";
 import { GenerateOTP } from "../utils/otp";
 import Admin from "../models/admin.model";
 import { createToken } from "../utils/token";
-import { clearFieldAfterDelay } from "../utils/general";
+import { clearAdminOtpAfterDelay } from "../utils/general";
 import { passwordHasher } from "../utils/password";
 import bcrypt from "bcrypt";
 import User from "../models/user.model";
@@ -39,7 +39,7 @@ export const registerAdmin = async (req: Request, res: Response) => {
 
     const token = createToken(newAdmin._id, newAdmin.email);
 
-    await clearFieldAfterDelay(newAdmin._id, Admin, "otp", 60 * 3);
+    await clearAdminOtpAfterDelay(newAdmin._id, 60 * 3);
 
     res.status(201).json({
       message: "Admin Created",
@@ -144,7 +144,8 @@ export const regenerateOTP = async (req: Request, res: Response) => {
 
     await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
 
-    await clearFieldAfterDelay(fetchedAdmin._id, Admin, "otp", 60 * 3);
+    await clearAdminOtpAfterDelay(fetchedAdmin._id, 60 * 3);
+
     // TODO: Need to remove otp from response
     return res.status(200).json({
       message: "OTP sent to your email",
@@ -179,7 +180,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
     // Send the otp to the user's email
     await sendMail(email, "Reset Password", `<h1>OTP: ${otp}</h1>`);
 
-    await clearFieldAfterDelay(fetchedAdmin._id, User, "otp", 60 * 3);
+    await clearAdminOtpAfterDelay(fetchedAdmin._id, 60 * 3);
     // Send the response
     return res.status(200).json({
       message: "OTP sent to your email",

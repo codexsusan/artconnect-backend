@@ -1,16 +1,25 @@
-import {Model} from "mongoose";
+import { Model } from "mongoose";
+import User from "../models/user.model";
+import Admin from "../models/admin.model";
 
-export const clearFieldAfterDelay = async (documentId: string, Document: Model<any>, fieldName: string, delayInSeconds: number) => {
-    // Get the document
-    const document = await Document.findOne({_id: documentId});
-    // If the document exists
-    if (document) {
-        // Set the timeout
-        setTimeout(async () => {
-            // Delete the field
-            document[fieldName] = "";
-            await document.save();
-        }, delayInSeconds * 1000);
-    }
+export const clearAdminOtpAfterDelay = async (
+  documentId: string,
+  delayInSeconds: number
+) => {
+  setTimeout(async () => {
+    await Admin.findByIdAndUpdate(documentId, {
+      otp: "",
+    });
+  }, delayInSeconds * 1000);
+};
 
-}
+export const clearUserOtpAfterDelay = async (
+  documentId: string,
+  delayInSeconds: number
+) => {
+  setTimeout(async () => {
+    await User.findByIdAndUpdate(documentId, {
+      otp: "",
+    });
+  }, delayInSeconds * 1000);
+};
