@@ -5,7 +5,7 @@ import {
   fetchAllCategories,
   fetchCategory,
 } from "../controller/category.controller";
-import {verifyToken} from "../middlewares/auth.middleware";
+import { verifyToken } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 

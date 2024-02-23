@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import "../utils/extended-express";
+import { getPresignedUrl } from "../middlewares/image.middleware";
 import { FileTransfer } from "../types";
+import "../utils/extended-express";
 
 export const uploadSingleImage = async (req: Request, res: Response) => {
   try {
@@ -14,12 +15,13 @@ export const uploadSingleImage = async (req: Request, res: Response) => {
     const fileData: FileTransfer = { ...req.file };
     const { location, size, key } = fileData;
 
+    const url = await getPresignedUrl(key);
+
     res.status(201).json({
       success: true,
       message: "Image uploaded successfully",
       data: {
-        url: location,
-        size,
+        url,
         key,
       },
     });
@@ -44,15 +46,21 @@ export const uploadMultipleImages = async (req: Request, res: Response) => {
 
     const fileData: FileTransfer[] = Object.values(req.files);
 
-    const data = fileData.map((file) => {
-      const { location, size, key } = file;
-      return { url: location, size, key };
-    });
+    const data = await Promise.all(
+      fileData.map(async (file) => {
+        const { key } = file;
+        const updatedKey = key.split("/")[1];
+        const url = await getPresignedUrl(updatedKey);
+        return { url, key: updatedKey };
+      })
+    );
 
     res.status(201).json({
       success: true,
       message: "Images uploaded successfully",
-      data,
+      data: {
+        ...data,
+      },
     });
   } catch (error) {
     console.error(error);

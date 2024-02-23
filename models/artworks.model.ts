@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
 import { ArtworkAvailability, ArtworkInterface } from "../types";
-// import UserModel from "./user.model";
 
 const artworkSchema: Schema<ArtworkInterface> = new Schema<ArtworkInterface>(
   {

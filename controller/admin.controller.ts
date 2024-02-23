@@ -144,6 +144,7 @@ export const regenerateOTP = async (req: Request, res: Response) => {
 
     await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
 
+    // Clear otp after 3 minutes
     await clearAdminOtpAfterDelay(fetchedAdmin._id, 60 * 3);
 
     // TODO: Need to remove otp from response

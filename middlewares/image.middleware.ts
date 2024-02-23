@@ -1,6 +1,8 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import multer from "multer";
 import multerS3 from "multer-s3";
+
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import {
   BUCKET_ACCESS_KEY,
@@ -29,11 +31,27 @@ const upload = multer({
     key: function (req, file, cb) {
       cb(
         null,
-        Date.now().toString() + "-" + file.originalname.split(" ").join("-")
+        "uploads/" +
+          Date.now().toString() +
+          "-" +
+          file.originalname.split(" ").join("-")
       );
     },
     contentType: multerS3.AUTO_CONTENT_TYPE,
   }),
 });
+
+export const getPresignedUrl = async (key: string) => {
+  const command = new GetObjectCommand({
+    Bucket: BUCKET_BUCKET_NAME,
+    Key: key,
+  });
+
+  const url: string = await getSignedUrl(s3, command, {
+    expiresIn: 3600,
+  });
+
+  return url;
+};
 
 export default upload;
