@@ -7,11 +7,20 @@ import {
   notifyUsers,
 } from "../services/notification.services";
 import { NotificationMessageInterface } from "../types";
+import { isFollowingStatus } from "../services/user-follower.services";
 
 export const followUser = async (req: Request, res: Response) => {
   try {
     const followerId = req.userId;
     const followingId = req.body.followingId;
+
+    if (followerId === followingId) {
+      return res.json({
+        message: "You can't follow yourself.",
+        success: false,
+      });
+    }
+
     const followStatus = await UserFollower.findOne({
       followingId,
       followerId,
@@ -100,11 +109,46 @@ export const unfollowUser = async (req: Request, res: Response) => {
 export const fetchAllFollowers = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
-    const followers = await UserFollower.find({ followingId: userId }).populate(
-      "followerId"
+    const followingId = req.params.followingId;
+
+    const page: number = parseInt((req.query.page || 1) as string);
+    const limit: number = parseInt((req.query.limit || 10) as string);
+
+    const query = { followingId };
+
+    const totalFollowers = await UserFollower.countDocuments(query);
+
+    const totalPages = Math.ceil(totalFollowers / limit);
+    const skipCount = (page - 1) * limit;
+
+    const followers = await UserFollower.find(query)
+      .skip(skipCount)
+      .limit(limit);
+
+    const followersList = await Promise.all(
+      followers.map(async (follower) => {
+        const currentFollower = await User.findById(follower.followerId).select(
+          "email name username profilePicture"
+        );
+        const isFollowing = await isFollowingStatus(
+          userId,
+          follower.followerId
+        );
+        return {
+          ...currentFollower.toJSON(),
+          isFollowing,
+        };
+      })
     );
 
-    return res.json({ success: true, data: followers });
+    return res.json({
+      success: true,
+      limit,
+      page,
+      totalPages,
+      total: totalFollowers,
+      data: followersList,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -118,14 +162,49 @@ export const fetchAllFollowers = async (req: Request, res: Response) => {
 export const fetchAllFollowing = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
-    const following = await UserFollower.find({ followerId: userId })
-      .select("-createdAt -updatedAt -__v")
-      .populate({
-        path: "followingId",
-        select: "email",
-      });
+    const followerId = req.params.followerId;
 
-    return res.json({ success: true, data: following });
+    const page: number = parseInt((req.query.page || 1) as string);
+    const limit: number = parseInt((req.query.limit || 10) as string);
+
+    const query = { followerId };
+
+    const totalFollowing = await UserFollower.countDocuments(query);
+
+    const totalPages = Math.ceil(totalFollowing / limit);
+    const skipCount = (page - 1) * limit;
+
+    const followings = await UserFollower.find(query)
+      .skip(skipCount)
+      .limit(limit)
+      .select("-createdAt -updatedAt -__v");
+
+    const followingList = await Promise.all(
+      followings.map(async (following) => {
+        const currentFollowing = await User.findById(
+          following.followingId
+        ).select("name username email profilePicture");
+
+        const isFollowing = await isFollowingStatus(
+          userId,
+          following.followingId
+        );
+
+        return {
+          ...currentFollowing.toJSON(),
+          isFollowing,
+        };
+      })
+    );
+
+    return res.json({
+      success: true,
+      limit,
+      page,
+      totalPages,
+      total: totalFollowing,
+      data: followingList,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({

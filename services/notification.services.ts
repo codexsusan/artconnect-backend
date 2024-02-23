@@ -20,11 +20,11 @@ export const notifyUsers = (body: NotificationMessageInterface) => {
       .messaging()
       .sendEachForMulticast(message)
       .then((response) => {
-        console.log(
-          "Successfully sent message:",
-          response
-          // response.results[0].error
-        );
+        // console.log(
+        //   "Successfully sent message:",
+        //   response
+        //   response.results[0].error
+        // );
         // res.status(200).send("message sent");
       })
       .catch((error) => {

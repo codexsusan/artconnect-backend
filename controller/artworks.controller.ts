@@ -138,13 +138,14 @@ export const fetchArtworksByUserId = async (req: Request, res: Response) => {
 
     const page: number = parseInt((req.query.page || 1) as string);
     const limit: number = parseInt((req.query.limit || 10) as string);
+    const query = { user: userId };
 
-    const totalArtworks = await Artwork.countDocuments({ user: userId });
+    const totalArtworks = await Artwork.countDocuments(query);
 
     const totalPages = Math.ceil(totalArtworks / limit);
     const skipCount = (page - 1) * limit;
 
-    const fetchedArtworks = await Artwork.find({ user: userId })
+    const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
       .populate({
@@ -322,15 +323,15 @@ export const fetchArtworkByCategory = async (req: Request, res: Response) => {
     const page: number = parseInt((req.query.page || 1) as string);
     const limit: number = parseInt((req.query.limit || 10) as string);
 
-    const totalArtworks = await Artwork.countDocuments({
+    const query = {
       categoryIds: categoryId,
-    });
+    };
+    const totalArtworks = await Artwork.countDocuments(query);
+
     const totalPages = Math.ceil(totalArtworks / limit);
     const skipCount = (page - 1) * limit;
 
-    const fetchedArtworks = await Artwork.find({
-      categoryIds: categoryId,
-    })
+    const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
       .populate({
@@ -400,16 +401,15 @@ export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
     const page: number = parseInt((req.query.page || 1) as string);
     const limit: number = parseInt((req.query.limit || 10) as string);
 
-    const totalArtworks = await Artwork.countDocuments({
+    const query = {
       createdAt: { $gte: today, $lt: tomorrow },
-    });
+    };
+    const totalArtworks = await Artwork.countDocuments(query);
 
     const totalPages = Math.ceil(totalArtworks / limit);
     const skipCount = (page - 1) * limit;
 
-    const fetchedArtworks = await Artwork.find({
-      createdAt: { $gte: today, $lt: tomorrow },
-    })
+    const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
       .populate({
@@ -478,16 +478,16 @@ export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
     const page: number = parseInt((req.query.page || 1) as string);
     const limit: number = parseInt((req.query.limit || 10) as string);
 
-    const totalArtworks = await Artwork.countDocuments({
+    const query = {
       createdAt: { $gte: startOfWeek, $lt: today },
-    });
+    };
+
+    const totalArtworks = await Artwork.countDocuments(query);
 
     const totalPages = Math.ceil(totalArtworks / limit);
     const skipCount = (page - 1) * limit;
 
-    const fetchedArtworks = await Artwork.find({
-      createdAt: { $gte: startOfWeek, $lt: today },
-    })
+    const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
       .populate({
@@ -553,16 +553,16 @@ export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
     const page: number = parseInt((req.query.page || 1) as string);
     const limit: number = parseInt((req.query.limit || 10) as string);
 
-    const totalArtworks = await Artwork.countDocuments({
+    const query = {
       createdAt: { $gte: startOfMonth, $lt: today },
-    });
+    };
+
+    const totalArtworks = await Artwork.countDocuments(query);
 
     const totalPages = Math.ceil(totalArtworks / limit);
     const skipCount = (page - 1) * limit;
 
-    const fetchedArtworks = await Artwork.find({
-      createdAt: { $gte: startOfMonth, $lt: today },
-    })
+    const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
       .populate({

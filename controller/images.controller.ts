@@ -13,7 +13,7 @@ export const uploadSingleImage = async (req: Request, res: Response) => {
     }
 
     const fileData: FileTransfer = { ...req.file };
-    const { location, size, key } = fileData;
+    const { key } = fileData;
 
     const url = await getPresignedUrl(key);
 
@@ -49,18 +49,15 @@ export const uploadMultipleImages = async (req: Request, res: Response) => {
     const data = await Promise.all(
       fileData.map(async (file) => {
         const { key } = file;
-        const updatedKey = key.split("/")[1];
-        const url = await getPresignedUrl(updatedKey);
-        return { url, key: updatedKey };
+        const url = await getPresignedUrl(key);
+        return { url, key };
       })
     );
 
     res.status(201).json({
       success: true,
       message: "Images uploaded successfully",
-      data: {
-        ...data,
-      },
+      data,
     });
   } catch (error) {
     console.error(error);

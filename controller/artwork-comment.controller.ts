@@ -130,10 +130,23 @@ export const fetchAllComments = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
     const artworkId: string = req.params.artworkId;
-    const topLevelComments = await Comment.find({
+
+    const page: number = parseInt((req.query.page || 1) as string);
+    const limit: number = parseInt((req.query.limit || 10) as string);
+
+    const query = {
       artworkId,
       parentId: "0",
-    })
+    };
+
+    const totalComments = await Comment.countDocuments(query);
+
+    const totalPages = Math.ceil(totalComments / limit);
+    const skipCount = (page - 1) * limit;
+
+    const topLevelComments = await Comment.find(query)
+      .skip(skipCount)
+      .limit(limit)
       .select("-__v")
       .sort({ createdAt: -1 })
       .populate({
@@ -164,9 +177,14 @@ export const fetchAllComments = async (req: Request, res: Response) => {
       };
       nestedComments.push(currentComment);
     }
+
     res.status(200).json({
       message: "Fetched successfully.",
       success: true,
+      limit,
+      page,
+      totalPages,
+      total: totalComments,
       data: nestedComments,
     });
   } catch (error) {
@@ -175,6 +193,7 @@ export const fetchAllComments = async (req: Request, res: Response) => {
   }
 };
 
+// TODO: Pagination yet to be implement
 export const fetchTopLevelComments = async (req: Request, res: Response) => {
   try {
     const artworkId = req.params.artworkId;
