@@ -231,11 +231,23 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 export const fetchAllUsers = async (req: Request, res: Response) => {
   try {
-    const users = await User.find();
+    const page: number = parseInt((req.query.page || 1) as string);
+    const limit: number = parseInt((req.query.limit || 10) as string);
+
+    const totalUsers = await User.countDocuments();
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    const skipCount = (page - 1) * limit;
+
+    const users = await User.find().skip(skipCount).limit(limit);
     return res.status(200).json({
       message: "Users fetched successfully",
       success: true,
       users,
+      totalPages,
+      page,
+      limit,
+      totalUsers,
     });
   } catch (error) {
     console.log(error);

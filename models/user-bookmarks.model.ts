@@ -3,13 +3,15 @@ import { UserBookmarksInterface } from "../types";
 
 const bookmarkSchema: Schema<UserBookmarksInterface> = new Schema(
   {
-    userId: {
+    user: {
       type: String,
       required: true,
+      ref: "User",
     },
-    artworkId: {
+    artwork: {
       type: String,
       required: true,
+      ref: "Artwork",
     },
   },
   {

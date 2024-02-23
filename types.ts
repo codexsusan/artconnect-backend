@@ -158,8 +158,8 @@ export interface NestedCommentInterface {
 
 export interface UserBookmarksInterface {
   _id: string;
-  userId: string;
-  artworkId: string;
+  user: string;
+  artwork: string;
 }
 
 export interface CommentLikeInterface {
