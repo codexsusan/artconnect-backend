@@ -19,6 +19,7 @@ export const fetchUserLatestNotifications = async (
     const notification = await Notification.find({
       userId: userId,
     })
+      .populate("userId", "name email username")
       .sort({ createdAt: -1 })
       .limit(10);
 

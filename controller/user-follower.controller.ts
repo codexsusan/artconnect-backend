@@ -42,7 +42,7 @@ export const followUser = async (req: Request, res: Response) => {
 
     const notification: NotificationMessageInterface = {
       title: "New Follower",
-      body: `${followerUser.email} started following you`,
+      body: `${followerUser.name} started following you`,
       tokens: followingUser.deviceToken,
     };
 
