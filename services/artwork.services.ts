@@ -48,7 +48,7 @@ export const checkIsLiked = async (artworkId: string, userId: string) => {
 
 export const checkIsBookmarked = async (artworkId: string, userId: string) => {
   return await Bookmark.findOne({
-    userId,
-    artworkId,
+    user: userId,
+    artwork: artworkId,
   });
 };

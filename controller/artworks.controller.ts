@@ -97,11 +97,7 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
     }
 
     const isLiked = await checkIsLiked(artworkId, userId);
-
-    const isBookmarked = await Bookmark.findOne({
-      userId,
-      artworkId,
-    });
+    const isBookmarked = await checkIsBookmarked(artworkId, userId);
 
     const { updatedArtwork, categoryData } = await ExtractArtworkCategories(
       fetchedArtwork.toJSON()
