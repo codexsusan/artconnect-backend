@@ -1,5 +1,6 @@
-import {Model, model, Schema} from "mongoose";
-import {UserInterface} from "../types";
+import { Model, model, Schema } from "mongoose";
+import { UserInterface } from "../types";
+import { DEFAULT_PROFILE } from "../constants";
 
 const userSchema: Schema<UserInterface> = new Schema<UserInterface>({
   username: {
@@ -16,8 +17,7 @@ const userSchema: Schema<UserInterface> = new Schema<UserInterface>({
   profilePicture: {
     type: String,
     required: true,
-    default:
-      "https://res.cloudinary.com/dgxbzasei/image/upload/v1691064812/download_xfqes8.jpg",
+    default: DEFAULT_PROFILE,
   },
   location: {
     type: String,

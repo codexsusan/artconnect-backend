@@ -21,3 +21,6 @@ export const BUCKET_BUCKET_NAME = process.env.BUCKET_BUCKET_NAME;
 export const BUCKET_ENDPOINT = process.env.BUCKET_ENDPOINT;
 export const BUCKET_REGION = process.env.BUCKET_REGION;
 export const BUCKET_SECRET_ACCESS_KEY = process.env.BUCKET_SECRET_ACCESS_KEY;
+
+
+export const DEFAULT_PROFILE = process.env.DEFAULT_PROFILE;
