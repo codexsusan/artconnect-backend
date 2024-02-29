@@ -8,6 +8,9 @@ import {
 } from "../services/notification.services";
 import { NotificationMessageInterface } from "../types";
 import { isFollowingStatus } from "../services/user-follower.services";
+import { getBasicUserDetails } from "../services/user.services";
+import { DEFAULT_PROFILE } from "../constants";
+import { getPresignedUrl } from "../middlewares/image.middleware";
 
 export const followUser = async (req: Request, res: Response) => {
   try {
@@ -57,7 +60,7 @@ export const followUser = async (req: Request, res: Response) => {
     return res.json({
       success: true,
       message: "Followed successfully",
-      data: userFollow,
+      // data: userFollow,
     });
   } catch (error) {
     console.log(error);
@@ -127,15 +130,21 @@ export const fetchAllFollowers = async (req: Request, res: Response) => {
 
     const followersList = await Promise.all(
       followers.map(async (follower) => {
-        const currentFollower = await User.findById(follower.followerId).select(
-          "email name username profilePicture"
-        );
+        const currentFollower = await getBasicUserDetails(follower.followerId);
         const isFollowing = await isFollowingStatus(
           userId,
           follower.followerId
         );
+
+        const profileKey = currentFollower.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...currentFollower.toJSON(),
+          profilePicture: profileUrl,
           isFollowing,
         };
       })
@@ -181,17 +190,24 @@ export const fetchAllFollowing = async (req: Request, res: Response) => {
 
     const followingList = await Promise.all(
       followings.map(async (following) => {
-        const currentFollowing = await User.findById(
+        const currentFollowing = await getBasicUserDetails(
           following.followingId
-        ).select("name username email profilePicture");
+        );
 
         const isFollowing = await isFollowingStatus(
           userId,
           following.followingId
         );
 
+        const profileKey = currentFollowing.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...currentFollowing.toJSON(),
+          profilePicture: profileUrl,
           isFollowing,
         };
       })

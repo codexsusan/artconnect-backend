@@ -149,7 +149,7 @@ export interface ArtworkCommentInterface {
 
 export interface NestedCommentInterface {
   _id: string;
-  user: string;
+  user: string | Partial<UserInterface>;
   artworkId: string;
   content: string;
   createdAt: Date;
@@ -190,7 +190,6 @@ export interface NotificationInterface {
   title: string;
   body: string;
 }
-
 
 export interface NotificationMessageInterface {
   title: string;

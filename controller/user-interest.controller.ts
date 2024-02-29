@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import Category from "../models/category.model";
 import UserInterest from "../models/user-interest.model";
-import { fetchByUserId } from "../services/user-interest.services";
+import { fetchInterestByUserId } from "../services/user-interest.services";
 import "../utils/extended-express";
 
 export const addInterest = async (req: Request, res: Response) => {
   const { interestIds }: { interestIds: string[] } = req.body;
   const userId: string = req.userId;
   try {
-    const fetchedUserInterests = await fetchByUserId(userId);
+    const fetchedUserInterests = await fetchInterestByUserId(userId);
 
     if (fetchedUserInterests.length > 0) {
       return res.status(400).json({
@@ -45,7 +45,7 @@ export const addInterest = async (req: Request, res: Response) => {
 export const getUserInterests = async (req: Request, res: Response) => {
   const userId: string = req.userId;
   try {
-    const fetchedUserInterests = await fetchByUserId(userId);
+    const fetchedUserInterests = await fetchInterestByUserId(userId);
 
     res.status(200).json({
       message: "Categories fetched.",

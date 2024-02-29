@@ -13,11 +13,18 @@ import {
   checkIsBookmarked,
   checkIsLiked,
 } from "../services/artwork.services";
-import { getUserById } from "../services/user.services";
 
-import { ArtworkAvailability, NotificationMessageInterface } from "../types";
+import { getBasicUserDetails, getUserById } from "../services/user.services";
+
+import {
+  ArtworkAvailability,
+  ArtworkInterface,
+  NotificationMessageInterface,
+} from "../types";
 import { getPresignedUrl } from "../middlewares/image.middleware";
 import Category from "../models/category.model";
+import User from "../models/user.model";
+import { DEFAULT_PROFILE } from "../constants";
 // import { notifyUsers } from "../services/notification.services";
 
 export const createArtwork = async (req: Request, res: Response) => {
@@ -88,7 +95,8 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
   const artworkId: string = req.params.artworkId;
   const userId = req.userId;
   try {
-    const fetchedArtwork = await ArtworkById(artworkId);
+    const fetchedArtwork = await Artwork.findById(artworkId);
+
     if (!fetchedArtwork) {
       return res.status(404).json({
         message: "Artwork not found.",
@@ -110,11 +118,22 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
       urls.push(url);
     }
 
+    const user = await getBasicUserDetails(updatedArtwork.user);
+    const profileKey = user.profilePicture;
+    const profileUrl =
+      profileKey === DEFAULT_PROFILE
+        ? DEFAULT_PROFILE
+        : await getPresignedUrl(profileKey);
+
     res.status(200).json({
       message: "Artwork fetched successfully.",
       success: true,
       data: {
         ...updatedArtwork,
+        user: {
+          ...user.toJSON(),
+          profilePicture: profileUrl,
+        },
         imageUrls: urls,
         isLiked: isLiked ? true : false,
         isBookmarked: isBookmarked ? true : false,
@@ -144,10 +163,10 @@ export const fetchArtworksByUserId = async (req: Request, res: Response) => {
     const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
-      .populate({
-        path: "user",
-        select: "name username email profilePicture",
-      })
+      // .populate({
+      //   path: "user",
+      //   select: "name username email profilePicture",
+      // })
       .sort({ createdAt: -1 });
 
     const updatedArtworks = await Promise.all(
@@ -175,8 +194,20 @@ export const fetchArtworksByUserId = async (req: Request, res: Response) => {
           urls.push(url);
         }
 
+        const user = await getBasicUserDetails(artwork.user);
+
+        const profileKey = user.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...updatedArtwork,
+          user: {
+            ...user.toJSON(),
+            profilePicture: profileUrl,
+          },
           imageUrls: urls,
           categories: categoryData,
         };
@@ -261,22 +292,23 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
     const fetchedArtworks = await Artwork.find()
       .skip(skipCount)
       .limit(limit)
-      .select("-__v")
-      .populate({
-        path: "user",
-        select: "name username email profilePicture",
-      })
-      .populate({
-        path: "categoryIds",
-        select: "name categoryName imageUrl",
-      })
       .sort({ createdAt: -1 });
 
     const updatedArtworks = await Promise.all(
       fetchedArtworks.map(async (artwork) => {
         const isLiked = await checkIsLiked(artwork._id, userId);
         const isBookmarked = await checkIsBookmarked(artwork._id, userId);
-        const originalKeys = artwork.imageUrls;
+
+        const currentArtwork = {
+          ...artwork.toJSON(),
+          isLiked: isLiked ? true : false,
+          isBookmarked: isBookmarked ? true : false,
+        };
+
+        const { updatedArtwork, categoryData } =
+          await ExtractArtworkCategories(currentArtwork);
+
+        const originalKeys = updatedArtwork.imageUrls;
         const urls = [];
 
         for (let key of originalKeys) {
@@ -284,11 +316,22 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
           urls.push(currentUrl);
         }
 
+        const user = await getBasicUserDetails(artwork.user);
+
+        const profileKey = user.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
-          ...artwork.toJSON(),
+          ...updatedArtwork,
+          user: {
+            ...user.toJSON(),
+            profilePicture: profileUrl,
+          },
           imageUrls: urls,
-          isLiked: isLiked ? true : false,
-          isBookmarked: isBookmarked ? true : false,
+          categories: categoryData,
         };
       })
     );
@@ -330,10 +373,6 @@ export const fetchArtworkByCategory = async (req: Request, res: Response) => {
     const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
-      .populate({
-        path: "user",
-        select: "name username email profilePicture",
-      })
       .sort({ createdAt: -1 });
 
     const updatedArtworks = await Promise.all(
@@ -358,8 +397,20 @@ export const fetchArtworkByCategory = async (req: Request, res: Response) => {
           urls.push(currentUrl);
         }
 
+        const user = await getBasicUserDetails(artwork.user);
+
+        const profileKey = user.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...updatedArtwork,
+          user: {
+            ...user.toJSON(),
+            profilePicture: profileUrl,
+          },
           imageUrls: urls,
           categories: categoryData,
         };
@@ -408,10 +459,6 @@ export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
     const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
-      .populate({
-        path: "user",
-        select: "name username email profilePicture",
-      })
       .sort({ likeCount: -1 });
 
     const updatedArtworks = await Promise.all(
@@ -436,8 +483,20 @@ export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
           urls.push(currentUrl);
         }
 
+        const user = await getBasicUserDetails(artwork.user);
+
+        const profileKey = user.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...updatedArtwork,
+          user: {
+            ...user.toJSON(),
+            profilePicture: profileUrl,
+          },
           imageUrls: urls,
           categories: categoryData,
         };
@@ -486,10 +545,6 @@ export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
     const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
-      .populate({
-        path: "user",
-        select: "name username email profilePicture",
-      })
       .sort({ likeCount: -1 });
 
     const updatedArtworks = await Promise.all(
@@ -514,8 +569,20 @@ export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
           urls.push(currentUrl);
         }
 
+        const user = await getBasicUserDetails(artwork.user);
+
+        const profileKey = user.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...updatedArtwork,
+          user: {
+            ...user.toJSON(),
+            profilePicture: profileUrl,
+          },
           imageUrls: urls,
           categories: categoryData,
         };
@@ -561,10 +628,6 @@ export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
     const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
-      .populate({
-        path: "user",
-        select: "name username email profilePicture",
-      })
       .sort({ likeCount: -1 });
     const updatedArtworks = await Promise.all(
       fetchedArtworks.map(async (artwork) => {
@@ -588,8 +651,20 @@ export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
           urls.push(currentUrl);
         }
 
+        const user = await getBasicUserDetails(artwork.user);
+
+        const profileKey = user.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...updatedArtwork,
+          user: {
+            ...user.toJSON(),
+            profilePicture: profileUrl,
+          },
           imageUrls: urls,
           categories: categoryData,
         };

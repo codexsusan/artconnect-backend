@@ -3,15 +3,18 @@ import "../utils/extended-express";
 import {
   getUserById,
   getUserExceptPasswordAndOTP,
+  getUserWithSelect,
 } from "../services/user.services";
 import User from "../models/user.model";
+import { DEFAULT_PROFILE } from "../constants";
+import { getPresignedUrl } from "../middlewares/image.middleware";
 
 export const fetchMe = async (req: Request, res: Response) => {
   try {
     const userId: string = req.userId;
 
     // Fetch User By excluding password and otp
-    const user = await getUserExceptPasswordAndOTP(userId);
+    const user = await getUserWithSelect(userId, "-password -otp -__v");
 
     if (!user) {
       return res
@@ -19,9 +22,20 @@ export const fetchMe = async (req: Request, res: Response) => {
         .json({ message: "User not found", success: false });
     }
 
-    return res
-      .status(200)
-      .json({ message: "User found", success: true, data: user });
+    const profileKey = user.profilePicture;
+    const profileUrl =
+      profileKey === DEFAULT_PROFILE
+        ? DEFAULT_PROFILE
+        : await getPresignedUrl(profileKey);
+
+    return res.status(200).json({
+      message: "User found",
+      success: true,
+      data: {
+        ...user.toJSON(),
+        profilePicture: profileUrl,
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -41,9 +55,20 @@ export const fetchUserById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "User found", success: true, data: user });
+    const profileKey = user.profilePicture;
+    const profileUrl =
+      profileKey === DEFAULT_PROFILE
+        ? DEFAULT_PROFILE
+        : await getPresignedUrl(profileKey);
+
+    return res.status(200).json({
+      message: "User found",
+      success: true,
+      data: {
+        ...user.toJSON(),
+        profilePicture: profileUrl,
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message, success: false });

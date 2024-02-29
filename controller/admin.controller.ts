@@ -9,6 +9,8 @@ import { passwordHasher } from "../utils/password";
 import bcrypt from "bcrypt";
 import User from "../models/user.model";
 import { sendMail } from "../utils/sendMail";
+import { getPresignedUrl } from "../middlewares/image.middleware";
+import { DEFAULT_PROFILE } from "../constants";
 
 export const registerAdmin = async (req: Request, res: Response) => {
   const { name, contact, email, password } = req.body;
@@ -58,13 +60,19 @@ export const registerAdmin = async (req: Request, res: Response) => {
 
 export const loginAdmin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  console.log({ email, password });
   try {
     const fetchedAdmin = await getAdminByEmail(email);
 
+    if (!fetchedAdmin) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, fetchedAdmin.password);
 
-    if (!fetchedAdmin || !isMatch) {
+    if (!isMatch) {
       return res.status(404).json({
         message: "Invalid Credentials.",
         success: false,
@@ -239,11 +247,30 @@ export const fetchAllUsers = async (req: Request, res: Response) => {
 
     const skipCount = (page - 1) * limit;
 
-    const users = await User.find().skip(skipCount).limit(limit);
+    const users = await User.find()
+      .skip(skipCount)
+      .limit(limit)
+      .select("-password -__v -lastLogin");
+
+    const updatedUsers = [];
+    for (let user of users) {
+      const originalKey = user.profilePicture;
+
+      const url =
+        originalKey === DEFAULT_PROFILE
+          ? DEFAULT_PROFILE
+          : await getPresignedUrl(originalKey);
+
+      const newUser = {
+        ...user.toJSON(),
+        profilePicture: url,
+      };
+      updatedUsers.push(newUser);
+    }
     return res.status(200).json({
       message: "Users fetched successfully",
       success: true,
-      users,
+      data: updatedUsers,
       totalPages,
       page,
       limit,

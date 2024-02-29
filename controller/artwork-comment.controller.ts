@@ -10,6 +10,9 @@ import {
 } from "../services/notification.services";
 import { NestedCommentInterface, NotificationMessageInterface } from "../types";
 import "../utils/extended-express";
+import { getBasicUserDetails } from "../services/user.services";
+import { DEFAULT_PROFILE } from "../constants";
+import { getPresignedUrl } from "../middlewares/image.middleware";
 
 export const addComment = async (req: Request, res: Response) => {
   try {
@@ -40,19 +43,38 @@ export const addComment = async (req: Request, res: Response) => {
       tokens: authorUser.deviceToken,
     };
 
-    notifyUsers(notification);
     artwork.commentCount = (parseInt(artwork.commentCount) + 1).toString();
+
     await artwork.save();
+
     if (userId !== artwork.user) {
+      notifyUsers(notification);
       await createNotification(
         artwork.user,
         notification.title,
         notification.body
       );
     }
-    res
-      .status(201)
-      .json({ message: "Comment added", success: true, data: comment });
+
+    const user = await getBasicUserDetails(artwork.user);
+
+    const profileKey = user.profilePicture;
+    const profileUrl =
+      profileKey === DEFAULT_PROFILE
+        ? DEFAULT_PROFILE
+        : await getPresignedUrl(profileKey);
+
+    res.status(201).json({
+      message: "Comment added",
+      success: true,
+      data: {
+        ...comment.toJSON(),
+        user: {
+          ...user.toJSON(),
+          profilePicture: profileUrl,
+        },
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message, success: false });
@@ -106,8 +128,16 @@ export const addNestedComment = async (req: Request, res: Response) => {
       tokens: authorUser.deviceToken,
     };
 
-    notifyUsers(notification);
+    const user = await getBasicUserDetails(userId);
+
+    const profileKey = user.profilePicture;
+    const profileUrl =
+      profileKey === DEFAULT_PROFILE
+        ? DEFAULT_PROFILE
+        : await getPresignedUrl(profileKey);
+
     if (userId !== parentComment.user) {
+      notifyUsers(notification);
       await createNotification(
         parentComment.user,
         notification.title,
@@ -118,7 +148,13 @@ export const addNestedComment = async (req: Request, res: Response) => {
     res.status(201).json({
       message: "Comment added",
       success: true,
-      data: newComment,
+      data: {
+        ...newComment.toJSON(),
+        user: {
+          ...user.toJSON(),
+          profilePicture: profileUrl,
+        },
+      },
     });
   } catch (error) {
     console.log(error);
@@ -148,11 +184,7 @@ export const fetchAllComments = async (req: Request, res: Response) => {
       .skip(skipCount)
       .limit(limit)
       .select("-__v")
-      .sort({ createdAt: -1 })
-      .populate({
-        path: "user",
-        select: "username name profilePicture",
-      });
+      .sort({ createdAt: -1 });
 
     const updatedTopLevelComments = Promise.all(
       topLevelComments.map(async (comment) => {
@@ -160,8 +192,21 @@ export const fetchAllComments = async (req: Request, res: Response) => {
           userId,
           commentId: comment._id,
         });
+
+        const user = await getBasicUserDetails(userId);
+
+        const profileKey = user.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...comment.toJSON(),
+          user: {
+            ...user.toJSON(),
+            profilePicture: profileUrl,
+          },
           isLiked: isLiked ? true : false,
         };
       })

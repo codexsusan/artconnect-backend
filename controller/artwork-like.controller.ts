@@ -55,8 +55,8 @@ export const switchLike = async (req: Request, res: Response) => {
         tokens: authorUser.deviceToken,
       };
 
-      notifyUsers(notification);
       if (userId !== fetchedArtwork.user) {
+        notifyUsers(notification);
         await createNotification(
           fetchedArtwork.user,
           notification.title,

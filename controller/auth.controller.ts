@@ -6,6 +6,7 @@ import { GenerateOTP } from "../utils/otp";
 import {
   getUserByEmail,
   getUserByEmailOrPhone,
+  getUserById,
 } from "../services/user.services";
 import User from "../models/user.model";
 import { clearUserOtpAfterDelay } from "../utils/general";
@@ -225,6 +226,47 @@ export const resetPassword = async (req: Request, res: Response) => {
     await user.save();
 
     // Send the response
+    return res.status(200).json({
+      message: "Password updated successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.userId;
+
+    const user = await getUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    const isMatch: boolean = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Invalid old password",
+        success: false,
+      });
+    }
+
+    const hashedPassword = await passwordHasher(newPassword);
+
+    user.password = hashedPassword;
+    await user.save();
+
     return res.status(200).json({
       message: "Password updated successfully.",
       success: true,

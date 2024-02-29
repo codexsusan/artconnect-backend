@@ -8,6 +8,8 @@ import {
   checkIsLiked,
 } from "../services/artwork.services";
 import { getPresignedUrl } from "../middlewares/image.middleware";
+import { getBasicUserDetails } from "../services/user.services";
+import { DEFAULT_PROFILE } from "../constants";
 
 export const switchBookmark = async (req: Request, res: Response) => {
   try {
@@ -48,10 +50,10 @@ export const userBookmarks = async (req: Request, res: Response) => {
     const artworks = await Promise.all(
       bookmarks.map(async (bookmark) => {
         const artwork = await Artwork.findById(bookmark.artwork)
-          .populate({
-            path: "user",
-            select: "name username email profilePicture",
-          })
+          // .populate({
+          //   path: "user",
+          //   select: "name username email profilePicture",
+          // })
           .select("-__v");
 
         const isLiked = await checkIsLiked(artwork._id, userId);
@@ -73,8 +75,21 @@ export const userBookmarks = async (req: Request, res: Response) => {
           const url = await getPresignedUrl(key);
           urls.push(url);
         }
+
+        const user = await getBasicUserDetails(artwork.user);
+
+        const profileKey = user.profilePicture;
+        const profileUrl =
+          profileKey === DEFAULT_PROFILE
+            ? DEFAULT_PROFILE
+            : await getPresignedUrl(profileKey);
+
         return {
           ...updatedArtwork,
+          user: {
+            ...user.toJSON(),
+            profilePicture: profileUrl,
+          },
           imageUrls: urls,
           categories: categoryData,
         };
