@@ -8,6 +8,7 @@ import {
 import User from "../models/user.model";
 import { DEFAULT_PROFILE } from "../constants";
 import { getPresignedUrl } from "../middlewares/image.middleware";
+import { isFollowingStatus } from "../services/user-follower.services";
 
 export const fetchMe = async (req: Request, res: Response) => {
   try {
@@ -46,6 +47,7 @@ export const fetchMe = async (req: Request, res: Response) => {
 };
 
 export const fetchUserById = async (req: Request, res: Response) => {
+  const requestingUser = req.userId;
   const userId: string = req.params.userId;
   try {
     // Fetch User By excluding password and otp
@@ -61,11 +63,14 @@ export const fetchUserById = async (req: Request, res: Response) => {
         ? DEFAULT_PROFILE
         : await getPresignedUrl(profileKey);
 
+    const isFollowing = await isFollowingStatus(userId, requestingUser);
+
     return res.status(200).json({
       message: "User found",
       success: true,
       data: {
         ...user.toJSON(),
+        isFollowing,
         profilePicture: profileUrl,
       },
     });
