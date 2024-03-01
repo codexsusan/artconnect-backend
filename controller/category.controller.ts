@@ -1,8 +1,12 @@
-import {Request, Response} from 'express';
+import { Request, Response } from "express";
 import "../utils/extended-express";
-import {fetchByCategoryName, fetchCategoryById} from "../services/category.services";
+import {
+  fetchByCategoryName,
+  fetchCategoryById,
+} from "../services/category.services";
 import Category from "../models/category.model";
 import Artwork from "../models/artworks.model";
+import { getPresignedUrl } from "../middlewares/image.middleware";
 
 export const createCategory = async (req: Request, res: Response) => {
   const { name, imageUrl } = req.body;
@@ -23,10 +27,16 @@ export const createCategory = async (req: Request, res: Response) => {
       imageUrl,
     });
 
+    const imageKey = newCategory.imageUrl;
+    const updatedUrl = await getPresignedUrl(imageKey);
+
     res.status(201).json({
       message: "Category Created",
       success: true,
-      category: newCategory,
+      data: {
+        ...newCategory.toJSON(),
+        imageUrl: updatedUrl,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -41,10 +51,21 @@ export const fetchAllCategories = async (req: Request, res: Response) => {
   try {
     const categories = await Category.find({}).select("-__v");
 
+    const updatedCategories = await Promise.all(
+      categories.map(async (category) => {
+        const imageKey = category.imageUrl;
+        const updatedUrl = await getPresignedUrl(imageKey);
+        return {
+          ...category.toJSON(),
+          imageUrl: updatedUrl,
+        };
+      })
+    );
+
     res.status(200).json({
       message: "Categories fetched",
       success: true,
-      categories,
+      data: updatedCategories,
     });
   } catch (error) {
     console.log(error);
@@ -66,10 +87,16 @@ export const fetchCategory = async (req: Request, res: Response) => {
       });
     }
 
+    const imageKey = category.imageUrl;
+    const updatedUrl = await getPresignedUrl(imageKey);
+
     res.status(200).json({
       message: "Category fetched",
       success: true,
-      category,
+      data: {
+        ...category.toJSON(),
+        imageUrl: updatedUrl,
+      },
     });
   } catch (error) {
     console.log(error);

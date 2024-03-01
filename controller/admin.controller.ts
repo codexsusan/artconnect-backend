@@ -240,7 +240,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 export const fetchAllUsers = async (req: Request, res: Response) => {
   try {
     const page: number = parseInt((req.query.page || 1) as string);
-    const limit: number = parseInt((req.query.limit || 10) as string);
+    const limit: number = parseInt((req.query.limit || 100) as string);
 
     const totalUsers = await User.countDocuments();
     const totalPages = Math.ceil(totalUsers / limit);
