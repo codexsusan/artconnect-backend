@@ -2,6 +2,7 @@ import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import "./utils/extended-express";
 import morgan from "morgan";
+import cors from "cors";
 
 import { createServer } from "http";
 
@@ -12,6 +13,7 @@ import { initSocket } from "./sockets/socketHandler";
 
 const port = PORT || 3000;
 const app = express();
+app.use(cors());
 
 // Middlewares
 app.use(express.json());

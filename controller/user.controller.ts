@@ -133,5 +133,3 @@ export const updateUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message, success: false });
   }
 };
-
-// TODO: Need to work with update password, email,etc.

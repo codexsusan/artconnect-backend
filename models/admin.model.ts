@@ -12,7 +12,7 @@ const adminModel: Schema<AdminInterface> = new Schema({
   },
   contact: {
     type: String,
-    required: true,
+    required: false,
   },
   location: {
     type: String,

@@ -13,7 +13,7 @@ import { getPresignedUrl } from "../middlewares/image.middleware";
 import { DEFAULT_PROFILE } from "../constants";
 
 export const registerAdmin = async (req: Request, res: Response) => {
-  const { name, contact, email, password } = req.body;
+  const { name, email, password } = req.body;
   try {
     const fetchedAdmin = await getAdminByEmail(email);
 
@@ -33,21 +33,21 @@ export const registerAdmin = async (req: Request, res: Response) => {
     const newAdmin = await Admin.create({
       name,
       adminName,
-      contact,
       email,
+      userType: "admin",
       password: hashedPassword,
-      otp,
+      // otp,
     });
 
-    const token = createToken(newAdmin._id, newAdmin.email);
+    // const token = createToken(newAdmin._id, newAdmin.email);
 
-    await clearAdminOtpAfterDelay(newAdmin._id, 60 * 3);
+    // await clearAdminOtpAfterDelay(newAdmin._id, 60 * 3);
 
     res.status(201).json({
       message: "Admin Created",
       success: true,
-      token,
-      otp,
+      // token,
+      // otp,
     });
   } catch (error) {
     console.log(error);
@@ -275,6 +275,24 @@ export const fetchAllUsers = async (req: Request, res: Response) => {
       page,
       limit,
       totalUsers,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const fetchMeAdmin = async (req: Request, res: Response) => {
+  try {
+    const adminId = req.userId;
+    const fetchedAdmin = await Admin.findById(adminId).select("-password -__v");
+    return res.status(200).json({
+      message: "Admin fetched successfully",
+      success: true,
+      data: fetchedAdmin,
     });
   } catch (error) {
     console.log(error);
