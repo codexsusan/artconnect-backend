@@ -45,6 +45,7 @@
     "otp-generator": "^4.0.1",
     "query-string": "^8.2.0",
     "resend": "^2.1.0",
-    "socket.io": "^4.7.4"
+    "socket.io": "^4.7.4",
+    "stripe": "^14.19.0"
   }
 }

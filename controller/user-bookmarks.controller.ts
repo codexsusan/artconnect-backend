@@ -46,15 +46,17 @@ export const userBookmarks = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
     const bookmarks = await Bookmark.find({ user: userId });
+    console.log(bookmarks);
 
     const artworks = await Promise.all(
       bookmarks.map(async (bookmark) => {
-        const artwork = await Artwork.findById(bookmark.artwork)
-          // .populate({
-          //   path: "user",
-          //   select: "name username email profilePicture",
-          // })
-          .select("-__v");
+        const artwork = await Artwork.findById(bookmark.artwork).select("-__v");
+
+        if (!artwork) {
+          return res
+            .status(404)
+            .json({ message: "Artwork not found", success: false });
+        }
 
         const isLiked = await checkIsLiked(artwork._id, userId);
         const isBookmarked = await checkIsBookmarked(artwork._id, userId);

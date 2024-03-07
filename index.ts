@@ -22,6 +22,7 @@ app.use(morgan("dev"));
 // socket.io
 const server = createServer(app);
 const io = initSocket(server);
+
 // Routes
 app.get("/api", (_req: Request, res: Response): void => {
   res.send({ message: "Hello world" });

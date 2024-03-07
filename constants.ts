@@ -24,3 +24,5 @@ export const BUCKET_SECRET_ACCESS_KEY = process.env.BUCKET_SECRET_ACCESS_KEY;
 
 
 export const DEFAULT_PROFILE = process.env.DEFAULT_PROFILE;
+
+export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
