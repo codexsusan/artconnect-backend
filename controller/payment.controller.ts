@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import "../utils/extended-express";
 import Artwork from "../models/artworks.model";
-import { STRIPE_SECRET_KEY } from "../constants";
+import { STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY } from "../constants";
 import { ArtworkInterface } from "../types";
 import { Document } from "mongoose";
+import StripeModule from "stripe";
+const stripe = new StripeModule(STRIPE_SECRET_KEY);
 
-const stripe = require("stripe")(STRIPE_SECRET_KEY);
+// const stripe = require("stripe")(STRIPE_SECRET_KEY);
 
 export const createPaymentCheckout = async (req: Request, res: Response) => {
   const { artworkId } = req.body;
@@ -28,15 +30,34 @@ export const createPaymentCheckout = async (req: Request, res: Response) => {
 
     const price = parseInt(artwork.price);
 
+    const customer = await stripe.customers.create();
+
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+      {
+        customer: customer.id,
+      },
+      {
+        apiVersion: "2023-10-16",
+      }
+    );
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: price,
       currency: "inr",
+      customer: customer.id,
+      payment_method_types: ["card"],
+      description: `You purchased the artwork for ${price} INR.`,
     });
 
     res.status(200).json({
       message: "Checkout created successfully.",
       success: true,
-      clientSecret: paymentIntent.client_secret,
+      data: {
+        paymentIntent: paymentIntent.client_secret,
+        ephemeralKey: ephemeralKey.secret,
+        customer: customer.id,
+        publishableKey: STRIPE_PUBLISHABLE_KEY,
+      },
     });
   } catch (error) {
     console.log(error);
