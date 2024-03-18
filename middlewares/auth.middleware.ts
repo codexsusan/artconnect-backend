@@ -3,11 +3,7 @@ import "../utils/extended-express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from "../constants";
 
-export const verifyToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
@@ -18,6 +14,8 @@ export const verifyToken = async (
     req.email = decoded.email;
     next();
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ message: "Token has expired.", success: false });
   }
 };

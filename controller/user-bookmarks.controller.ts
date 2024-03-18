@@ -24,7 +24,9 @@ export const switchBookmark = async (req: Request, res: Response) => {
     if (fetchedBookmark) {
       // delete bookmark
       await Bookmark.findOneAndDelete({ _id: fetchedBookmark._id });
-      res.status(200).json({ message: "Bookmark removed", success: true });
+      return res
+        .status(200)
+        .json({ message: "Bookmark removed", success: true });
     } else {
       // add bookmark
       const bookmark = await Bookmark.create({
@@ -32,7 +34,7 @@ export const switchBookmark = async (req: Request, res: Response) => {
         artwork: artworkId,
       });
 
-      res
+      return res
         .status(201)
         .json({ message: "Bookmark added", success: true, data: bookmark });
     }
@@ -46,7 +48,6 @@ export const userBookmarks = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
     const bookmarks = await Bookmark.find({ user: userId });
-    console.log(bookmarks);
 
     const artworks = await Promise.all(
       bookmarks.map(async (bookmark) => {
@@ -98,13 +99,13 @@ export const userBookmarks = async (req: Request, res: Response) => {
       })
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Fetched successfully.",
       success: true,
       data: artworks,
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: error.message, success: false });
+    return res.status(500).json({ message: error.message, success: false });
   }
 };

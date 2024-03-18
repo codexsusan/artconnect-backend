@@ -64,3 +64,64 @@ export const createPaymentCheckout = async (req: Request, res: Response) => {
     return res.status(500).json({ message: error.message, success: false });
   }
 };
+
+export const createPayment = async (req: Request, res: Response) => {
+  try {
+    const { artworkId } = req.params;
+    const artwork: Document<ArtworkInterface> &
+      Required<{
+        price: string;
+      }> = await Artwork.findOne({
+      _id: artworkId,
+      isForSale: true,
+      quantity: { $gt: 0 },
+    });
+
+    if (!artwork) {
+      return res.status(400).json({
+        message: "Artwork not for sale.",
+        success: false,
+      });
+    }
+
+    const price = parseInt(artwork.price);
+
+    const params = {
+      card: {
+        number: "4242424242424242",
+        exp_month: 12,
+        exp_year: 2023,
+        cvc: 123,
+      },
+    };
+
+    const token = await stripe.tokens.create({
+      card: {
+        number: "4242424242424242",
+        exp_month: "12",
+        exp_year: "2023",
+        cvc: "123",
+      },
+    });
+
+    console.log(token);
+
+    // const customer = await stripe.customers.create({
+    //   name: "Name Here",
+    //   email: "Email Here",
+    //   description: "Customer for purchasing artwork.",
+    //   payment_method: "card",
+    //   address: {
+    //     line1: "510 Townsend St",
+    //     postal_code: "98140",
+    //     city: "San Francisco",
+    //     state: "CA",
+    //     country: "US",
+    //   },
+    // });
+    return res.status(200).json({ message: "Token created.", success: true });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message, success: false });
+  }
+};
