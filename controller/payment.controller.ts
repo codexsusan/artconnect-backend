@@ -35,16 +35,20 @@ export const createPaymentCheckout = async (req: Request, res: Response) => {
     const ephemeralKey = await stripe.ephemeralKeys.create(
       {
         customer: customer.id,
-      },
-      {
-        apiVersion: "2023-10-16",
       }
+      // {
+      //   apiVersion: "2023-10-16",
+      // }
     );
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: price,
       currency: "inr",
       customer: customer.id,
+      payment_method: "card",
+      confirm: true,
+      confirmation_method: "manual",
+      use_stripe_sdk: true,
       payment_method_types: ["card"],
       description: `You purchased the artwork for ${price} INR.`,
     });
