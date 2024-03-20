@@ -45,11 +45,9 @@ export const createPaymentCheckout = async (req: Request, res: Response) => {
       amount: price,
       currency: "inr",
       customer: customer.id,
-      // payment_method: "card",
-      confirm: true,
-      confirmation_method: "manual",
-      use_stripe_sdk: true,
-      payment_method_types: ["cards"],
+      automatic_payment_methods: {
+        enabled: true,
+      },
       description: `You purchased the artwork for ${price} INR.`,
     });
 
