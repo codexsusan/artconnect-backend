@@ -1,5 +1,7 @@
 import { UserInterface } from "../types";
 import User from "../models/user.model";
+import { DEFAULT_PROFILE } from "../constants";
+import { getPresignedUrl } from "../middlewares/image.middleware";
 
 export const getUserByEmail = async (email: UserInterface["email"]) => {
   try {
@@ -33,7 +35,9 @@ export const getUserById = async (userId: UserInterface["_id"]) => {
   }
 };
 
-export const getUserExceptPasswordAndOTP = async (userId: UserInterface["_id"]) => {
+export const getUserExceptPasswordAndOTP = async (
+  userId: UserInterface["_id"]
+) => {
   try {
     return User.findById(userId).select("-password -__v");
   } catch (e) {
@@ -53,4 +57,10 @@ export const getUserWithSelect = async (
   select: string
 ) => {
   return User.findById(userId).select(select);
+};
+
+export const getProfilePictureUrl = (profileKey: string) => {
+  return profileKey === DEFAULT_PROFILE
+    ? DEFAULT_PROFILE
+    : getPresignedUrl(profileKey);
 };

@@ -16,6 +16,10 @@ import {
   userBookmarks,
 } from "../controller/user-bookmarks.controller";
 import { verifyToken } from "../middlewares/auth.middleware";
+import {
+  fetchAllPurchasedArtworks,
+  fetchAllSoldArtwork,
+} from "../controller/transaction.controller";
 
 const router: Router = express.Router();
 
@@ -35,5 +39,13 @@ router.get("/fetch/top/month", verifyToken, fetchThisMonthTopArtwork);
 router.post("/switch-like", verifyToken, switchLike);
 router.post("/switch-bookmark", verifyToken, switchBookmark);
 router.get("/bookmark", verifyToken, userBookmarks);
+
+// Purchased Artworks
+router.get(
+  "/fetch/:userId/purchased/all",
+  verifyToken,
+  fetchAllPurchasedArtworks
+);
+router.get("/fetch/:userId/sold/all", verifyToken, fetchAllSoldArtwork);
 
 export default router;

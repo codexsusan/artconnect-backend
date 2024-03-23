@@ -4,12 +4,10 @@ import "./utils/extended-express";
 import morgan from "morgan";
 import cors from "cors";
 
-import { createServer } from "http";
-
 import { PORT } from "./constants";
 import { dbConnection } from "./db_connection/connection";
 import mainRoutes from "./routes/main.routes";
-import { initSocket } from "./sockets/socketHandler";
+import client from "./utils/redis";
 
 const port = PORT || 3000;
 const app = express();
@@ -18,10 +16,6 @@ app.use(cors());
 // Middlewares
 app.use(express.json());
 app.use(morgan("dev"));
-
-// socket.io
-const server = createServer(app);
-const io = initSocket(server);
 
 // Routes
 app.get("/api", (_req: Request, res: Response): void => {
@@ -36,13 +30,15 @@ app.use("*", (_req: Request, res: Response): void => {
 });
 
 app.use(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (_err: Error, _req: Request, res: Response, _next: NextFunction): void => {
     res.status(500).send({ message: "Something went wrong!" });
   }
 );
 
-server.listen(port, async () => {
+app.listen(port, async () => {
   await dbConnection();
+  await client.connect();
   return console.log(`Server running on port http://localhost:${port}`);
 });
 

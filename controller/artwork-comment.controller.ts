@@ -214,7 +214,7 @@ export const fetchAllComments = async (req: Request, res: Response) => {
 
     const nestedComments: NestedCommentInterface[] =
       [] as NestedCommentInterface[];
-    for (let comment of await updatedTopLevelComments) {
+    for (const comment of await updatedTopLevelComments) {
       const comments = await fetchNestedComments(comment._id, userId);
       const currentComment = {
         ...comment,

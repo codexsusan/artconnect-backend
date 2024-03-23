@@ -181,7 +181,7 @@ export interface TransactionInterface {
   buyerId: string;
   transactionDate: Date;
   transactionAmount: string;
-  transactionStatus: string;
+  // transactionStatus: string;
 }
 
 export interface NotificationInterface {

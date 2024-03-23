@@ -26,10 +26,6 @@ const TransactionModel: Schema<TransactionInterface> = new Schema(
       type: String,
       required: true,
     },
-    transactionStatus: {
-      type: String,
-      required: true,
-    },
   },
   {
     timestamps: true,

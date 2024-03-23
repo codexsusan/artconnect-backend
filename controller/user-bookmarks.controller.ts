@@ -74,7 +74,7 @@ export const userBookmarks = async (req: Request, res: Response) => {
         const originalKeys = updatedArtwork.imageUrls;
         const urls = [];
 
-        for (let key of originalKeys) {
+        for (const key of originalKeys) {
           const url = await getPresignedUrl(key);
           urls.push(url);
         }

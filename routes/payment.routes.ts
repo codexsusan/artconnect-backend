@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import {
-  createPayment,
+  //   createPayment,
   createPaymentCheckout,
 } from "../controller/payment.controller";
 import { verifyToken } from "../middlewares/auth.middleware";

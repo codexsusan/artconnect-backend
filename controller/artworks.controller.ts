@@ -4,10 +4,8 @@ import "../utils/extended-express";
 import Comment from "../models/artwork-comment.model";
 import Like from "../models/artwork-like.model";
 import Artwork from "../models/artworks.model";
-import Bookmark from "../models/user-bookmarks.model";
 
 import {
-  ArtworkById,
   CreateArtwork,
   ExtractArtworkCategories,
   checkIsBookmarked,
@@ -16,15 +14,10 @@ import {
 
 import { getBasicUserDetails, getUserById } from "../services/user.services";
 
-import {
-  ArtworkAvailability,
-  ArtworkInterface,
-  NotificationMessageInterface,
-} from "../types";
+import { DEFAULT_PROFILE } from "../constants";
 import { getPresignedUrl } from "../middlewares/image.middleware";
 import Category from "../models/category.model";
-import User from "../models/user.model";
-import { DEFAULT_PROFILE } from "../constants";
+import { ArtworkAvailability } from "../types";
 // import { notifyUsers } from "../services/notification.services";
 
 export const createArtwork = async (req: Request, res: Response) => {
@@ -48,7 +41,7 @@ export const createArtwork = async (req: Request, res: Response) => {
         : ArtworkAvailability.NOTFORSALE;
 
     const checkedCategoryIds = [];
-    for (let id of categoryIds) {
+    for (const id of categoryIds) {
       const category = await Category.findById(id);
       if (category) {
         checkedCategoryIds.push(id);
@@ -113,7 +106,7 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
 
     const originalKeys = updatedArtwork.imageUrls;
     const urls = [];
-    for (let key of originalKeys) {
+    for (const key of originalKeys) {
       const url = await getPresignedUrl(key);
       urls.push(url);
     }
@@ -189,7 +182,7 @@ export const fetchArtworksByUserId = async (req: Request, res: Response) => {
         const originalKeys = updatedArtwork.imageUrls;
         const urls = [];
 
-        for (let key of originalKeys) {
+        for (const key of originalKeys) {
           const url = await getPresignedUrl(key);
           urls.push(url);
         }
@@ -311,7 +304,7 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
         const originalKeys = updatedArtwork.imageUrls;
         const urls = [];
 
-        for (let key of originalKeys) {
+        for (const key of originalKeys) {
           const currentUrl = await getPresignedUrl(key);
           urls.push(currentUrl);
         }
@@ -392,7 +385,7 @@ export const fetchArtworkByCategory = async (req: Request, res: Response) => {
         const originalKeys = updatedArtwork.imageUrls;
         const urls = [];
 
-        for (let key of originalKeys) {
+        for (const key of originalKeys) {
           const currentUrl = await getPresignedUrl(key);
           urls.push(currentUrl);
         }
@@ -478,7 +471,7 @@ export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
         const originalKeys = updatedArtwork.imageUrls;
         const urls = [];
 
-        for (let key of originalKeys) {
+        for (const key of originalKeys) {
           const currentUrl = await getPresignedUrl(key);
           urls.push(currentUrl);
         }
@@ -564,7 +557,7 @@ export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
         const originalKeys = updatedArtwork.imageUrls;
         const urls = [];
 
-        for (let key of originalKeys) {
+        for (const key of originalKeys) {
           const currentUrl = await getPresignedUrl(key);
           urls.push(currentUrl);
         }
@@ -646,7 +639,7 @@ export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
         const originalKeys = updatedArtwork.imageUrls;
         const urls = [];
 
-        for (let key of originalKeys) {
+        for (const key of originalKeys) {
           const currentUrl = await getPresignedUrl(key);
           urls.push(currentUrl);
         }
