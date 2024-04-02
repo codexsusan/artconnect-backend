@@ -54,9 +54,11 @@ export const userBookmarks = async (req: Request, res: Response) => {
         const artwork = await Artwork.findById(bookmark.artwork).select("-__v");
 
         if (!artwork) {
-          return res
-            .status(404)
-            .json({ message: "Artwork not found", success: false });
+          console.log(bookmark);
+          await Bookmark.findOneAndDelete({
+            _id: bookmark._id,
+          });
+          return null;
         }
 
         const isLiked = await checkIsLiked(artwork._id, userId);
@@ -99,10 +101,12 @@ export const userBookmarks = async (req: Request, res: Response) => {
       })
     );
 
+    const updatedArtworks = artworks.filter((artwork) => artwork !== null);
+
     return res.status(200).json({
       message: "Fetched successfully.",
       success: true,
-      data: artworks,
+      data: updatedArtworks,
     });
   } catch (error) {
     console.log(error);
