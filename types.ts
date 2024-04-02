@@ -196,3 +196,11 @@ export interface NotificationMessageInterface {
   body: string;
   tokens: string[];
 }
+
+export interface Cart {
+  _id: string;
+  user: string;
+  artwork: string;
+  quantity: number;
+  createdAt: Date;
+}

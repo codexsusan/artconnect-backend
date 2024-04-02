@@ -30,6 +30,7 @@ export const registerAdmin = async (req: Request, res: Response) => {
 
     await sendMail(email, "Verify Account", `<h1>OTP: ${otp}</h1>`);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const newAdmin = await Admin.create({
       name,
       adminName,
@@ -253,7 +254,7 @@ export const fetchAllUsers = async (req: Request, res: Response) => {
       .select("-password -__v -lastLogin");
 
     const updatedUsers = [];
-    for (let user of users) {
+    for (const user of users) {
       const originalKey = user.profilePicture;
 
       const url =

@@ -10,6 +10,7 @@ import {
   ExtractArtworkCategories,
   checkIsBookmarked,
   checkIsLiked,
+  getArtworkDetailData,
 } from "../services/artwork.services";
 
 import { getBasicUserDetails, getUserById } from "../services/user.services";
@@ -156,10 +157,6 @@ export const fetchArtworksByUserId = async (req: Request, res: Response) => {
     const fetchedArtworks = await Artwork.find(query)
       .skip(skipCount)
       .limit(limit)
-      // .populate({
-      //   path: "user",
-      //   select: "name username email profilePicture",
-      // })
       .sort({ createdAt: -1 });
 
     const updatedArtworks = await Promise.all(
@@ -288,45 +285,9 @@ export const fetchLatestArtworks = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 });
 
     const updatedArtworks = await Promise.all(
-      fetchedArtworks.map(async (artwork) => {
-        const isLiked = await checkIsLiked(artwork._id, userId);
-        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
-
-        const currentArtwork = {
-          ...artwork.toJSON(),
-          isLiked: isLiked ? true : false,
-          isBookmarked: isBookmarked ? true : false,
-        };
-
-        const { updatedArtwork, categoryData } =
-          await ExtractArtworkCategories(currentArtwork);
-
-        const originalKeys = updatedArtwork.imageUrls;
-        const urls = [];
-
-        for (const key of originalKeys) {
-          const currentUrl = await getPresignedUrl(key);
-          urls.push(currentUrl);
-        }
-
-        const user = await getBasicUserDetails(artwork.user);
-
-        const profileKey = user.profilePicture;
-        const profileUrl =
-          profileKey === DEFAULT_PROFILE
-            ? DEFAULT_PROFILE
-            : await getPresignedUrl(profileKey);
-
-        return {
-          ...updatedArtwork,
-          user: {
-            ...user.toJSON(),
-            profilePicture: profileUrl,
-          },
-          imageUrls: urls,
-          categories: categoryData,
-        };
-      })
+      fetchedArtworks.map((artwork) =>
+        getArtworkDetailData(artwork._id, userId)
+      )
     );
 
     res.status(200).json({

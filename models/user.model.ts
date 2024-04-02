@@ -1,6 +1,6 @@
 import { Model, model, Schema } from "mongoose";
-import { UserInterface } from "../types";
 import { DEFAULT_PROFILE } from "../constants";
+import { UserInterface } from "../types";
 
 const userSchema: Schema<UserInterface> = new Schema<UserInterface>({
   username: {
