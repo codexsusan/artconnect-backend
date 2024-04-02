@@ -3,9 +3,8 @@ import {
   uploadMultipleImages,
   uploadSingleImage,
 } from "../controller/images.controller";
-import { verifyOTP } from "../controller/auth.controller";
-import upload from "../middlewares/image.middleware";
 import { verifyToken } from "../middlewares/auth.middleware";
+import upload from "../middlewares/image.middleware";
 
 const router = express.Router();
 

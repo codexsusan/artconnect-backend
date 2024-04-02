@@ -20,6 +20,7 @@ import commentLikeRoutes from "./comment-like.routes";
 import paymentRoutes from "./payment.routes";
 import tranactionRoutes from "./transaction.routes";
 import cartRoutes from "./cart.routes";
+import shippingRoutes from "./shipping.routes";
 
 const router = express.Router();
 
@@ -49,5 +50,6 @@ router.use("/transaction", tranactionRoutes);
 router.use("/notification", notificationRoutes);
 router.use("/payment", paymentRoutes);
 router.use("/cart", cartRoutes);
+router.use("/shipping", shippingRoutes);
 
 export default router;

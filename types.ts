@@ -204,3 +204,13 @@ export interface Cart {
   quantity: number;
   createdAt: Date;
 }
+
+export interface ShippingDetails {
+  user: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phoneNumber: string;
+}
