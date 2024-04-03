@@ -214,3 +214,11 @@ export interface ShippingDetails {
   country: string;
   phoneNumber: string;
 }
+
+export interface Order {
+  _id: string;
+  artworkId: string;
+  buyerId: string;
+  price: string;
+}
+  

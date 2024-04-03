@@ -36,9 +36,19 @@ export const ExtractArtworkCategories = async (
   const categoryData = await Category.find({
     _id: { $in: categoryIds },
   }).select("-__v");
+
+  const updatedCategoryData = await Promise.all(
+    categoryData.map(async (category) => {
+      const imageUrl = await getPresignedUrl(category.imageUrl);
+      return {
+        ...category.toJSON(),
+        imageUrl,
+      };
+    })
+  );
   return {
     updatedArtwork,
-    categoryData,
+    categories: updatedCategoryData,
   };
 };
 
@@ -69,7 +79,7 @@ export const getArtworkDetailData = async (
     isBookmarked: isBookmarked ? true : false,
   };
 
-  const { updatedArtwork, categoryData } =
+  const { updatedArtwork, categories } =
     await ExtractArtworkCategories(currentArtwork);
 
   const originalKeys = updatedArtwork.imageUrls;
@@ -95,6 +105,6 @@ export const getArtworkDetailData = async (
       profilePicture: profileUrl,
     },
     imageUrls: urls,
-    categories: categoryData,
+    categories,
   };
 };

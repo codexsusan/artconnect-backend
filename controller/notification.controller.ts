@@ -4,14 +4,15 @@ import User from "../models/user.model";
 import Notification from "../models/notification.model";
 import { getPresignedUrl } from "../middlewares/image.middleware";
 import { DEFAULT_PROFILE } from "../constants";
+import { getUserExceptPasswordAndOTP } from "../services/user.services";
+import { NotificationMessageInterface } from "../types";
+import { notifyUsers } from "../services/notification.services";
 
 export const fetchUserLatestNotifications = async (
   req: Request,
   res: Response
 ) => {
   const userId = req.userId;
-
-  // const page = req.query.page || 1;
 
   const page: number = parseInt((req.query.page || 1) as string);
   const limit: number = parseInt((req.query.limit || 10) as string);
@@ -68,6 +69,44 @@ export const fetchUserLatestNotifications = async (
       page,
       totalPages,
       total: totalNotifications,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message, success: false });
+  }
+};
+
+export const pushNotificationHandler = async (req: Request, res: Response) => {
+  try {
+    const senderId = req.userId;
+    const receiverId = req.params.receiverId;
+    const { message } = req.body;
+    const receiverUser = await getUserExceptPasswordAndOTP(receiverId);
+    const senderUser = await getUserExceptPasswordAndOTP(senderId);
+
+    if (!receiverUser) {
+      return res
+        .status(404)
+        .json({ message: "Receiver not found.", success: false });
+    }
+
+    if (!senderUser) {
+      return res
+        .status(404)
+        .json({ message: "Sender not found.", success: false });
+    }
+
+    const notification: NotificationMessageInterface = {
+      title: senderUser.name,
+      body: message,
+      tokens: receiverUser.deviceToken,
+    };
+
+    notifyUsers(notification);
+
+    return res.status(200).json({
+      message: "Notification sent successfully.",
+      success: true,
     });
   } catch (error) {
     console.log(error);

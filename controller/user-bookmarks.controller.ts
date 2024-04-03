@@ -70,7 +70,7 @@ export const userBookmarks = async (req: Request, res: Response) => {
           isBookmarked: isBookmarked ? true : false,
         };
 
-        const { updatedArtwork, categoryData } =
+        const { updatedArtwork, categories } =
           await ExtractArtworkCategories(currentArtwork);
 
         const originalKeys = updatedArtwork.imageUrls;
@@ -96,7 +96,7 @@ export const userBookmarks = async (req: Request, res: Response) => {
             profilePicture: profileUrl,
           },
           imageUrls: urls,
-          categories: categoryData,
+          categories: categories,
         };
       })
     );

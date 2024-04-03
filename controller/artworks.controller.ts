@@ -7,16 +7,11 @@ import Artwork from "../models/artworks.model";
 
 import {
   CreateArtwork,
-  ExtractArtworkCategories,
-  checkIsBookmarked,
-  checkIsLiked,
   getArtworkDetailData,
 } from "../services/artwork.services";
 
-import { getBasicUserDetails, getUserById } from "../services/user.services";
+import { getUserById } from "../services/user.services";
 
-import { DEFAULT_PROFILE } from "../constants";
-import { getPresignedUrl } from "../middlewares/image.middleware";
 import Category from "../models/category.model";
 import { ArtworkAvailability } from "../types";
 // import { notifyUsers } from "../services/notification.services";
@@ -98,41 +93,12 @@ export const fetchArtworkById = async (req: Request, res: Response) => {
       });
     }
 
-    const isLiked = await checkIsLiked(artworkId, userId);
-    const isBookmarked = await checkIsBookmarked(artworkId, userId);
-
-    const { updatedArtwork, categoryData } = await ExtractArtworkCategories(
-      fetchedArtwork.toJSON()
-    );
-
-    const originalKeys = updatedArtwork.imageUrls;
-    const urls = [];
-    for (const key of originalKeys) {
-      const url = await getPresignedUrl(key);
-      urls.push(url);
-    }
-
-    const user = await getBasicUserDetails(updatedArtwork.user);
-    const profileKey = user.profilePicture;
-    const profileUrl =
-      profileKey === DEFAULT_PROFILE
-        ? DEFAULT_PROFILE
-        : await getPresignedUrl(profileKey);
+    const artworkData = await getArtworkDetailData(artworkId, userId);
 
     res.status(200).json({
       message: "Artwork fetched successfully.",
       success: true,
-      data: {
-        ...updatedArtwork,
-        user: {
-          ...user.toJSON(),
-          profilePicture: profileUrl,
-        },
-        imageUrls: urls,
-        isLiked: isLiked ? true : false,
-        isBookmarked: isBookmarked ? true : false,
-        categories: categoryData,
-      },
+      data: artworkData,
     });
   } catch (error) {
     console.log(error);
@@ -160,48 +126,9 @@ export const fetchArtworksByUserId = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 });
 
     const updatedArtworks = await Promise.all(
-      fetchedArtworks.map(async (artwork) => {
-        const isLiked = await checkIsLiked(artwork._id, currentUserId);
-        const isBookmarked = await checkIsBookmarked(
-          artwork._id,
-          currentUserId
-        );
-
-        const currentArtwork = {
-          ...artwork.toJSON(),
-          isLiked: isLiked ? true : false,
-          isBookmarked: isBookmarked ? true : false,
-        };
-
-        const { updatedArtwork, categoryData } =
-          await ExtractArtworkCategories(currentArtwork);
-
-        const originalKeys = updatedArtwork.imageUrls;
-        const urls = [];
-
-        for (const key of originalKeys) {
-          const url = await getPresignedUrl(key);
-          urls.push(url);
-        }
-
-        const user = await getBasicUserDetails(artwork.user);
-
-        const profileKey = user.profilePicture;
-        const profileUrl =
-          profileKey === DEFAULT_PROFILE
-            ? DEFAULT_PROFILE
-            : await getPresignedUrl(profileKey);
-
-        return {
-          ...updatedArtwork,
-          user: {
-            ...user.toJSON(),
-            profilePicture: profileUrl,
-          },
-          imageUrls: urls,
-          categories: categoryData,
-        };
-      })
+      fetchedArtworks.map(async (artwork) =>
+        getArtworkDetailData(artwork._id, currentUserId)
+      )
     );
 
     if (!fetchedArtworks) {
@@ -330,45 +257,9 @@ export const fetchArtworkByCategory = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 });
 
     const updatedArtworks = await Promise.all(
-      fetchedArtworks.map(async (artwork) => {
-        const isLiked = await checkIsLiked(artwork._id, userId);
-        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
-
-        const currentArtwork = {
-          ...artwork.toJSON(),
-          isLiked: isLiked ? true : false,
-          isBookmarked: isBookmarked ? true : false,
-        };
-
-        const { updatedArtwork, categoryData } =
-          await ExtractArtworkCategories(currentArtwork);
-
-        const originalKeys = updatedArtwork.imageUrls;
-        const urls = [];
-
-        for (const key of originalKeys) {
-          const currentUrl = await getPresignedUrl(key);
-          urls.push(currentUrl);
-        }
-
-        const user = await getBasicUserDetails(artwork.user);
-
-        const profileKey = user.profilePicture;
-        const profileUrl =
-          profileKey === DEFAULT_PROFILE
-            ? DEFAULT_PROFILE
-            : await getPresignedUrl(profileKey);
-
-        return {
-          ...updatedArtwork,
-          user: {
-            ...user.toJSON(),
-            profilePicture: profileUrl,
-          },
-          imageUrls: urls,
-          categories: categoryData,
-        };
-      })
+      fetchedArtworks.map(async (artwork) =>
+        getArtworkDetailData(artwork._id, userId)
+      )
     );
 
     return res.status(200).json({
@@ -416,45 +307,9 @@ export const fetchTodaysTopArtwork = async (req: Request, res: Response) => {
       .sort({ likeCount: -1 });
 
     const updatedArtworks = await Promise.all(
-      fetchedArtworks.map(async (artwork) => {
-        const isLiked = await checkIsLiked(artwork._id, userId);
-        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
-
-        const currentArtwork = {
-          ...artwork.toJSON(),
-          isLiked: isLiked ? true : false,
-          isBookmarked: isBookmarked ? true : false,
-        };
-
-        const { updatedArtwork, categoryData } =
-          await ExtractArtworkCategories(currentArtwork);
-
-        const originalKeys = updatedArtwork.imageUrls;
-        const urls = [];
-
-        for (const key of originalKeys) {
-          const currentUrl = await getPresignedUrl(key);
-          urls.push(currentUrl);
-        }
-
-        const user = await getBasicUserDetails(artwork.user);
-
-        const profileKey = user.profilePicture;
-        const profileUrl =
-          profileKey === DEFAULT_PROFILE
-            ? DEFAULT_PROFILE
-            : await getPresignedUrl(profileKey);
-
-        return {
-          ...updatedArtwork,
-          user: {
-            ...user.toJSON(),
-            profilePicture: profileUrl,
-          },
-          imageUrls: urls,
-          categories: categoryData,
-        };
-      })
+      fetchedArtworks.map(async (artwork) =>
+        getArtworkDetailData(artwork._id, userId)
+      )
     );
 
     return res.status(200).json({
@@ -502,45 +357,9 @@ export const fetchThisWeeksTopArtwork = async (req: Request, res: Response) => {
       .sort({ likeCount: -1 });
 
     const updatedArtworks = await Promise.all(
-      fetchedArtworks.map(async (artwork) => {
-        const isLiked = await checkIsLiked(artwork._id, userId);
-        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
-
-        const currentArtwork = {
-          ...artwork.toJSON(),
-          isLiked: isLiked ? true : false,
-          isBookmarked: isBookmarked ? true : false,
-        };
-
-        const { updatedArtwork, categoryData } =
-          await ExtractArtworkCategories(currentArtwork);
-
-        const originalKeys = updatedArtwork.imageUrls;
-        const urls = [];
-
-        for (const key of originalKeys) {
-          const currentUrl = await getPresignedUrl(key);
-          urls.push(currentUrl);
-        }
-
-        const user = await getBasicUserDetails(artwork.user);
-
-        const profileKey = user.profilePicture;
-        const profileUrl =
-          profileKey === DEFAULT_PROFILE
-            ? DEFAULT_PROFILE
-            : await getPresignedUrl(profileKey);
-
-        return {
-          ...updatedArtwork,
-          user: {
-            ...user.toJSON(),
-            profilePicture: profileUrl,
-          },
-          imageUrls: urls,
-          categories: categoryData,
-        };
-      })
+      fetchedArtworks.map(async (artwork) =>
+        getArtworkDetailData(artwork._id, userId)
+      )
     );
 
     return res.status(200).json({
@@ -584,45 +403,9 @@ export const fetchThisMonthTopArtwork = async (req: Request, res: Response) => {
       .limit(limit)
       .sort({ likeCount: -1 });
     const updatedArtworks = await Promise.all(
-      fetchedArtworks.map(async (artwork) => {
-        const isLiked = await checkIsLiked(artwork._id, userId);
-        const isBookmarked = await checkIsBookmarked(artwork._id, userId);
-
-        const currentArtwork = {
-          ...artwork.toJSON(),
-          isLiked: isLiked ? true : false,
-          isBookmarked: isBookmarked ? true : false,
-        };
-
-        const { updatedArtwork, categoryData } =
-          await ExtractArtworkCategories(currentArtwork);
-
-        const originalKeys = updatedArtwork.imageUrls;
-        const urls = [];
-
-        for (const key of originalKeys) {
-          const currentUrl = await getPresignedUrl(key);
-          urls.push(currentUrl);
-        }
-
-        const user = await getBasicUserDetails(artwork.user);
-
-        const profileKey = user.profilePicture;
-        const profileUrl =
-          profileKey === DEFAULT_PROFILE
-            ? DEFAULT_PROFILE
-            : await getPresignedUrl(profileKey);
-
-        return {
-          ...updatedArtwork,
-          user: {
-            ...user.toJSON(),
-            profilePicture: profileUrl,
-          },
-          imageUrls: urls,
-          categories: categoryData,
-        };
-      })
+      fetchedArtworks.map(async (artwork) =>
+        getArtworkDetailData(artwork._id, userId)
+      )
     );
 
     return res.status(200).json({

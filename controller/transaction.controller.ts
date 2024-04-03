@@ -92,7 +92,7 @@ export const fetchAllPurchasedArtworks = async (
             isBookmarked: isBookmarked ? true : false,
           };
 
-          const { updatedArtwork, categoryData } =
+          const { updatedArtwork, categories } =
             await ExtractArtworkCategories(currentArtwork);
 
           const originalKeys = updatedArtwork.imageUrls;
@@ -124,7 +124,7 @@ export const fetchAllPurchasedArtworks = async (
               profilePicture: profileUrl,
             },
             imageUrls: urls,
-            categories: categoryData,
+            categories: categories,
           };
         })
       );
@@ -170,7 +170,7 @@ export const fetchAllSoldArtwork = async (req: Request, res: Response) => {
             isBookmarked: isBookmarked ? true : false,
           };
 
-          const { updatedArtwork, categoryData } =
+          const { updatedArtwork, categories } =
             await ExtractArtworkCategories(currentArtwork);
 
           const originalKeys = updatedArtwork.imageUrls;
@@ -202,7 +202,7 @@ export const fetchAllSoldArtwork = async (req: Request, res: Response) => {
               profilePicture: profileUrl,
             },
             imageUrls: urls,
-            categories: categoryData,
+            categories: categories,
           };
         })
       );

@@ -3,35 +3,36 @@ import admin from "../utils/notification-admin";
 import Notification from "../models/notification.model";
 
 export const notifyUsers = (body: NotificationMessageInterface) => {
-  const tokens = [...body.tokens];
+  try {
+    const tokens = [...body.tokens];
 
-  let notification = {
-    title: body.title,
-    body: body.body,
-  };
+    const notification = {
+      title: body.title,
+      body: body.body,
+    };
 
-  const message = {
-    notification,
-    tokens,
-  };
+    const message = {
+      notification,
+      tokens,
+    };
 
-  if (tokens.length !== 0)
-    admin
-      .messaging()
-      .sendEachForMulticast(message)
-      .then((response) => {
-        // console.log(
-        //   "Successfully sent message:",
-        //   response
-        //   response.results[0].error
-        // );
-        // res.status(200).send("message sent");
-      })
-      .catch((error) => {
-        console.log("Error sending message:", error);
-      });
+    if (tokens.length !== 0) admin.messaging().sendEachForMulticast(message);
+    // .then((response) => {
+    // console.log(
+    //   "Successfully sent message:",
+    //   response
+    //   response.results[0].error
+    // );
+    // })
+    // .catch((error) => {
+    //   console.log("Error sending message:", error);
+    // });
 
-  return notification;
+    return notification;
+  } catch (error) {
+    console.log("Error sending message:", error);
+  }
+  
 };
 
 export const createNotification = async (
