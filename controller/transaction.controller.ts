@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import "../utils/extended-express";
 import { DEFAULT_PROFILE } from "../constants";
 import { getPresignedUrl } from "../middlewares/image.middleware";
 import Artwork from "../models/artworks.model";
@@ -10,7 +11,7 @@ import {
 } from "../services/artwork.services";
 import { getBasicUserDetails } from "../services/user.services";
 import { ArtworkAvailability } from "../types";
-import "../utils/extended-express";
+
 import { cacheHandler } from "../utils/redis";
 
 export const createTransaction = async (req: Request, res: Response) => {

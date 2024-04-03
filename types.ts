@@ -215,10 +215,11 @@ export interface ShippingDetails {
   phoneNumber: string;
 }
 
-export interface Order {
+export interface OrderInterface {
   _id: string;
-  artworkId: string;
-  buyerId: string;
+  artwork: string;
+  buyer: string;
+  seller: string;
+  quantity: number;
   price: string;
 }
-  

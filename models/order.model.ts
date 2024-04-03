@@ -1,16 +1,25 @@
 import { Schema, model } from "mongoose";
-import { Order } from "../types";
+import { OrderInterface } from "../types";
 
-const OrderModel: Schema<Order> = new Schema(
+const OrderModel: Schema<OrderInterface> = new Schema(
   {
-    artworkId: {
+    artwork: {
       type: String,
       ref: "Artwork",
       required: true,
     },
-    buyerId: {
+    buyer: {
       type: String,
       ref: "User",
+      required: true,
+    },
+    seller: {
+      type: String,
+      ref: "User",
+      required: true,
+    },
+    quantity: {
+      type: Number,
       required: true,
     },
     price: {

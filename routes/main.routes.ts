@@ -18,7 +18,7 @@ import searchRoutes from "./search.routes";
 import notificationRoutes from "./notification.routes";
 import commentLikeRoutes from "./comment-like.routes";
 import paymentRoutes from "./payment.routes";
-import transactionRoutes from "./transaction.routes";
+import orderRoutes from "./order.routes";
 import cartRoutes from "./cart.routes";
 import shippingRoutes from "./shipping.routes";
 
@@ -46,7 +46,7 @@ router.use("/bookmark", userBookmarkRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/user-follower", userFollowerRoutes);
 router.use("/search", searchRoutes);
-router.use("/transaction", transactionRoutes);
+router.use("/order", orderRoutes);
 router.use("/notification", notificationRoutes);
 router.use("/payment", paymentRoutes);
 router.use("/cart", cartRoutes);
