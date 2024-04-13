@@ -1,4 +1,4 @@
-import { Model, Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import { ShippingDetails } from "../types";
 
 const shippingSchema: Schema<ShippingDetails> = new Schema({
@@ -6,6 +6,14 @@ const shippingSchema: Schema<ShippingDetails> = new Schema({
     type: String,
     required: true,
     ref: "User",
+  },
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
   },
   address: {
     type: String,

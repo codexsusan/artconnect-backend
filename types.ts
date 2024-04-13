@@ -207,6 +207,8 @@ export interface Cart {
 
 export interface ShippingDetails {
   user: string;
+  firstName: string;
+  lastName: string;
   address: string;
   city: string;
   state: string;
@@ -219,6 +221,7 @@ export interface OrderInterface {
   _id: string;
   artwork: string;
   buyer: string;
+  shipping: string;
   seller: string;
   quantity: number;
   price: string;

@@ -4,10 +4,27 @@ import Shipping from "../models/shipping.model";
 
 export const addShippingAddress = async (req: Request, res: Response) => {
   try {
-    const { address, city, state, postalCode, country, phoneNumber } = req.body;
+    const {
+      firstName,
+      lastName,
+      address,
+      city,
+      state,
+      postalCode,
+      country,
+      phoneNumber,
+    } = req.body;
     const userId = req.userId;
 
-    if (!address || !city || !state || !postalCode || !phoneNumber) {
+    if (
+      !firstName ||
+      !lastName ||
+      !address ||
+      !city ||
+      !state ||
+      !postalCode ||
+      !phoneNumber
+    ) {
       return res
         .status(400)
         .json({ message: "Please fill all required fields", success: false });
@@ -15,6 +32,8 @@ export const addShippingAddress = async (req: Request, res: Response) => {
 
     const shipping = await Shipping.create({
       user: userId,
+      firstName,
+      lastName,
       address,
       city,
       state,
