@@ -28,3 +28,5 @@ export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 export const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
 
 export const UPSTASH_URL = process.env.UPSTASH_URL;
+
+export const PRIVATE_KEY_ID = process.env.PRIVATE_KEY_ID;

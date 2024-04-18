@@ -41,7 +41,8 @@ export const createOrder = async (req: Request, res: Response) => {
       seller: sellerId,
       quantity,
       shipping: shippingId,
-      price: totalPrice,
+      price,
+      totalPrice,
     });
 
     artwork.quantity = (
@@ -59,7 +60,6 @@ export const createOrder = async (req: Request, res: Response) => {
       .json({ message: "Ordered successfully.", data: order });
   } catch (error) {
     console.log(error);
-
     return res.status(500).json({ message: error.message, success: false });
   }
 };
@@ -165,7 +165,7 @@ export const fetchAllSales = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
 
-    const orders = await Order.find({ seller: userId })
+    const orders = await Order.find()
       .populate({
         path: "artwork",
         select: "-__v",
@@ -180,6 +180,39 @@ export const fetchAllSales = async (req: Request, res: Response) => {
       data: updatedOrders,
       success: true,
       message: "Fetched all sales.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message, success: false });
+  }
+};
+
+export const fetchTodaysAllOrders = async (req: Request, res: Response) => {
+  try {
+    const today: Date = new Date();
+    const startOfToday: Date = new Date(today.setHours(0, 0, 0, 0));
+    const endOfToday: Date = new Date(today.setHours(23, 59, 59, 999));
+
+    const orders = await Order.find({
+      createdAt: { $gte: startOfToday, $lte: endOfToday },
+    })
+      .populate({
+        path: "buyer",
+        select: "username name email profilePicture",
+      })
+      .populate({
+        path: "seller",
+        select: "username name email profilePicture",
+      })
+      .populate({
+        path: "artwork",
+        select: "user title content imageUrls price",
+      });
+
+    return res.status(200).json({
+      message: "Orders fetched successfully.",
+      success: true,
+      data: orders,
     });
   } catch (error) {
     console.log(error);

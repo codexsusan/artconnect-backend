@@ -225,4 +225,6 @@ export interface OrderInterface {
   seller: string;
   quantity: number;
   price: string;
+  totalPrice: string;
+  createdAt: Date;
 }
