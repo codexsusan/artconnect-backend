@@ -62,9 +62,13 @@ export const getRevenueofLast30days = async (req: Request, res: Response) => {
     const today: Date = new Date();
     const thirtyDaysAgo: Date = subDays(startOfDay(today), 29);
 
-    const orders = await Order.find({
+    const query = {
       createdAt: { $gte: thirtyDaysAgo, $lte: today },
-    });
+    };
+
+    const count = await Order.countDocuments(query);
+
+    const orders = await Order.find(query);
 
     const revenueByDate: { [date: string]: number } = {};
     const currentDate: Date = new Date(thirtyDaysAgo);
@@ -74,7 +78,9 @@ export const getRevenueofLast30days = async (req: Request, res: Response) => {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
+    let totalRevenue = 0;
     orders.forEach((order: OrderInterface) => {
+      totalRevenue += parseFloat(order.totalPrice);
       const orderDate: string = format(order.createdAt, "yyyy-MM-dd");
       revenueByDate[orderDate] += parseFloat(order.totalPrice);
     });
@@ -92,6 +98,8 @@ export const getRevenueofLast30days = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: "Revenue fetched successfully.",
       data: data,
+      totalRevenue,
+      count,
     });
   } catch (error) {
     console.log(error);

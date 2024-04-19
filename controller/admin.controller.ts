@@ -207,18 +207,30 @@ export const forgetPassword = async (req: Request, res: Response) => {
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const email = req.email;
+  const { oldPassword, newPassword } = req.body;
+
   try {
     // Check if the user exists
     const fetchedAdmin = await getAdminByEmail(email);
     if (!fetchedAdmin) {
       return res.status(404).json({
-        message: "User not found",
+        message: "Admin not found",
         success: false,
       });
     }
 
-    const hashedPassword = await passwordHasher(password);
+    // Check if the old password is correct
+    const isMatch = await bcrypt.compare(oldPassword, fetchedAdmin.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Invalid old password",
+        success: false,
+      });
+    }
+
+    const hashedPassword = await passwordHasher(newPassword);
 
     // Update the user's password
     fetchedAdmin.password = hashedPassword;
@@ -298,6 +310,81 @@ export const fetchMeAdmin = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const updateAdmin = async (req: Request, res: Response) => {
+  try {
+    const adminId = req.userId;
+
+    const { name, email, adminName } = req.body;
+
+    const admin = await Admin.findById(adminId);
+
+    if (!admin) {
+      return res.status(404).json({
+        message: "Admin not found",
+        success: false,
+      });
+    }
+
+    if (email && email !== admin.email) {
+      const existingAdmin = await getAdminByEmail(email);
+      if (existingAdmin && existingAdmin._id.toString() !== adminId) {
+        return res.status(400).json({
+          message: "Email is already in use by another admin",
+          success: false,
+        });
+      }
+    }
+
+    if (name) admin.name = name;
+    if (email) admin.email = email;
+    if (adminName) admin.adminName = adminName;
+
+    await admin.save();
+
+    const updatedAdmin = await Admin.findById(adminId).select("-password -__v");
+    res.status(200).json({
+      message: "Admin updated successfully",
+      success: true,
+      data: updatedAdmin,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const checkAdminNameAvailability = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { adminName } = req.body;
+
+    const admin = await Admin.findOne({ adminName });
+
+    if (admin) {
+      return res.status(400).json({
+        message: "Admin name is already in use",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Admin name is available",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
       message: error.message,
       success: false,
     });
