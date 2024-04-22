@@ -91,9 +91,19 @@ export const getAllArtworkFromCart = async (req: Request, res: Response) => {
     }
 
     const updatedCartItems = await Promise.all(
-      cartItems.map((cartItems) =>
-        getArtworkDetailData(cartItems.artwork, user)
-      )
+      cartItems.map(async (cartItems) => {
+        const updatedArtworkData = await getArtworkDetailData(
+          cartItems.artwork,
+          user
+        );
+
+        const { likeCount, commentCount, isForSale, categories, ...data } =
+          updatedArtworkData;
+        return {
+          ...cartItems.toObject(),
+          artwork: data,
+        };
+      })
     );
 
     return res.status(200).json({

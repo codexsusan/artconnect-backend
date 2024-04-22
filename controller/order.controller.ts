@@ -196,7 +196,10 @@ export const purchaseFromCart = async (req: Request, res: Response) => {
 
         await artwork.save();
 
-        await Cart.findByIdAndDelete(cartOrder._id);
+        console.log({ cartItemId: cartOrder._id });
+
+        const cartItemToDelete = await Cart.findByIdAndDelete(cartOrder._id);
+        console.log(cartItemToDelete);
         return order;
       })
     );
