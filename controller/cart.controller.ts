@@ -97,6 +97,7 @@ export const getAllArtworkFromCart = async (req: Request, res: Response) => {
           user
         );
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { likeCount, commentCount, isForSale, categories, ...data } =
           updatedArtworkData;
         return {

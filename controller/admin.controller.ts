@@ -37,18 +37,18 @@ export const registerAdmin = async (req: Request, res: Response) => {
       email,
       userType: "admin",
       password: hashedPassword,
-      // otp,
+      otp,
     });
 
-    // const token = createToken(newAdmin._id, newAdmin.email);
+    const token = createToken(newAdmin._id, newAdmin.email);
 
-    // await clearAdminOtpAfterDelay(newAdmin._id, 60 * 3);
+    await clearAdminOtpAfterDelay(newAdmin._id, 60 * 3);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Admin Created",
       success: true,
-      // token,
-      // otp,
+      token,
+      otp,
     });
   } catch (error) {
     console.log(error);
@@ -82,7 +82,7 @@ export const loginAdmin = async (req: Request, res: Response) => {
 
     const token: string = createToken(fetchedAdmin._id, fetchedAdmin.email);
     return res.status(200).json({
-      message: "Admin Logged In",
+      message: "Login Successful",
       success: true,
       token,
     });

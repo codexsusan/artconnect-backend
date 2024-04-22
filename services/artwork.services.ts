@@ -8,7 +8,7 @@ import Bookmark from "../models/user-bookmarks.model";
 import { ArtworkInterface } from "../types";
 import { getBasicUserDetails } from "./user.services";
 
-export const CreateArtwork = async (data: any) => {
+export const CreateArtwork = async (data: Partial<ArtworkInterface>) => {
   return await Artwork.create({
     ...data,
     creationDate: new Date(),

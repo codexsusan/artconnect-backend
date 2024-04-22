@@ -91,7 +91,7 @@ export const loginUser = async (req: Request, res: Response) => {
     await user.save();
 
     return res.status(200).json({
-      message: "User Logged In",
+      message: "Login Successful",
       success: true,
       token,
     });

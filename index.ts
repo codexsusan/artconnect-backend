@@ -36,10 +36,14 @@ app.use(
   }
 );
 
-app.listen(port, async () => {
+const server = app.listen(port, async () => {
   await dbConnection();
   await client.connect();
   return console.log(`Server running on port http://localhost:${port}`);
 });
 
+export default server;
+
+
+export { app };
 // server.timeout = parseInt(SERVER_TIMEOUT as string);
