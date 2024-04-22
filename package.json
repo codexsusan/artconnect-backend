@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "NODE_ENV=dev tsnd --respawn index.ts",
+    "prod": "NODE_ENV=prod tsnd --respawn index.ts",
     "lint": "eslint . --ext .ts",
     "test": "jest --detectOpenHandles"
   },
