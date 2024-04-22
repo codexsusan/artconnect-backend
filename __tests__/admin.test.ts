@@ -1,4 +1,5 @@
 import request from "supertest";
+import bcrypt from "bcrypt";
 
 import { app } from "../index";
 import server from "../index";
@@ -73,6 +74,55 @@ describe("Login Admin", () => {
     );
   });
 
+  it("Shouldn't login the admin with invalid credentials", async () => {
+    const requestBody = {
+      email: "susankhadka1@gmail.com",
+      password: "12345678",
+    };
+
+    const response = await request(app)
+      .post("/api/v1/admin/login")
+      .send(requestBody);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        message: "Invalid Credentials",
+        success: false,
+      })
+    );
+  });
+});
+
+describe("Password Manager", () => {
+  it("Allow logged in admin to reset password", async () => {
+    const requestBody = {
+      oldPassword: "12345678",
+      newPassword: "1234567890",
+    };
+
+    const response = await request(app)
+      .post("/api/v1/admin/reset-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send(requestBody);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        message: "Password updated successfully.",
+        success: true,
+      })
+    );
+
+    const updatedUser = await Admin.findOne({
+      email: "susankhadka@gmail.com",
+    });
+    const isPasswordUpdated = await bcrypt.compare(
+      requestBody.newPassword,
+      updatedUser.password
+    );
+    expect(isPasswordUpdated).toBe(true);
+  });
   afterAll((done) => {
     server.close(done);
   });

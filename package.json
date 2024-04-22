@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsnd --respawn index.ts",
+    "dev": "NODE_ENV=dev tsnd --respawn index.ts",
     "lint": "eslint . --ext .ts",
     "test": "jest --detectOpenHandles"
   },

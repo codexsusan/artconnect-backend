@@ -65,8 +65,8 @@ export const loginAdmin = async (req: Request, res: Response) => {
     const fetchedAdmin = await getAdminByEmail(email);
 
     if (!fetchedAdmin) {
-      return res.status(404).json({
-        message: "User not found.",
+      return res.status(401).json({
+        message: "Invalid Credentials",
         success: false,
       });
     }
