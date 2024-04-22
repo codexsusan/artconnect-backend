@@ -6,7 +6,7 @@ import server from "../index";
 import { dbConnection } from "../db_connection/connection";
 import Admin from "../models/admin.model";
 
-// let token = "";
+let token;
 
 describe("Register Admin", () => {
   beforeAll(async () => {
