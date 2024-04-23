@@ -226,6 +226,8 @@ export const fetchAllOrders = async (req: Request, res: Response) => {
       })
       .select("-__v");
 
+    console.log(orders);
+
     const updatedOrders = await Promise.all(
       orders.map(async (order) => getOrderDetails(order._id, userId))
     );

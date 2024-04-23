@@ -3,7 +3,7 @@ import { DATABASE_URL } from "../constants";
 
 export const dbConnection = async () => {
   const env = {
-    dev: `${DATABASE_URL}/dev`,
+    dev: `${DATABASE_URL}/production`,
     test: `${DATABASE_URL}/test`,
     prod: `${DATABASE_URL}/production`,
   };

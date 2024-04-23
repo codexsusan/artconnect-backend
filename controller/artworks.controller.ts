@@ -14,6 +14,7 @@ import { getUserById } from "../services/user.services";
 
 import Category from "../models/category.model";
 import { ArtworkAvailability } from "../types";
+import Order from "../models/order.model";
 // import { notifyUsers } from "../services/notification.services";
 
 export const createArtwork = async (req: Request, res: Response) => {
@@ -183,6 +184,8 @@ export const deleteArtworkById = async (req: Request, res: Response) => {
     }
     fetchedUser.totalArtworks -= 1;
     await fetchedUser.save();
+
+    await Order.deleteMany({ artwork: artworkId });
 
     res.status(200).json({
       message: "Artwork deleted successfully.",

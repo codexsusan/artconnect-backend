@@ -208,6 +208,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
 
 export const resetPassword = async (req: Request, res: Response) => {
   const email = req.email;
+
   const { oldPassword, newPassword } = req.body;
 
   try {

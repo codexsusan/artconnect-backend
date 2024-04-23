@@ -13,7 +13,7 @@ import { NotificationMessageInterface } from "../types";
 
 export const switchLike = async (req: Request, res: Response) => {
   const userId = req.userId;
-  const artworkId = req.body.artworkId;
+  const { artworkId } = req.body;
   try {
     const fetchedLike = await Like.findOne({ userId, artworkId });
     const fetchedArtwork = await Artwork.findById(artworkId);
@@ -43,7 +43,7 @@ export const switchLike = async (req: Request, res: Response) => {
         fetchedArtwork.likeCount,
         artworkId
       );
-      res.json({
+      return res.status(200).json({
         message: "Like removed successfully.",
         success: true,
       });
@@ -64,7 +64,7 @@ export const switchLike = async (req: Request, res: Response) => {
         );
       }
 
-      res.json({
+      return res.status(200).json({
         message: "Like added successfully.",
         success: true,
       });

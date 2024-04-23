@@ -72,6 +72,8 @@ describe("Login User", () => {
 
     token = response.body.token;
 
+    console.log(token);
+
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
@@ -186,3 +188,7 @@ describe("Password Manager", () => {
     server.close(done);
   });
 });
+
+console.log(token);
+
+export { token };

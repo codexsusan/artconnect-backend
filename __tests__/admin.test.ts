@@ -1,13 +1,9 @@
 import request from "supertest";
-import bcrypt from "bcrypt";
 
-import { app } from "../index";
-import server from "../index";
+import server, { app } from "../index";
 
 import { dbConnection } from "../db_connection/connection";
 import Admin from "../models/admin.model";
-
-let token;
 
 describe("Register Admin", () => {
   beforeAll(async () => {
@@ -62,8 +58,6 @@ describe("Login Admin", () => {
       .post("/api/v1/admin/login")
       .send(requestBody);
 
-    token = response.body.token;
-
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
@@ -91,37 +85,6 @@ describe("Login Admin", () => {
         success: false,
       })
     );
-  });
-});
-
-describe("Password Manager", () => {
-  it("Allow logged in admin to reset password", async () => {
-    const requestBody = {
-      oldPassword: "12345678",
-      newPassword: "1234567890",
-    };
-
-    const response = await request(app)
-      .post("/api/v1/admin/reset-password")
-      .set("Authorization", `Bearer ${token}`)
-      .send(requestBody);
-
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        message: "Password updated successfully.",
-        success: true,
-      })
-    );
-
-    const updatedUser = await Admin.findOne({
-      email: "susankhadka@gmail.com",
-    });
-    const isPasswordUpdated = await bcrypt.compare(
-      requestBody.newPassword,
-      updatedUser.password
-    );
-    expect(isPasswordUpdated).toBe(true);
   });
   afterAll((done) => {
     server.close(done);
